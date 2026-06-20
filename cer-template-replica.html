@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CER Workbook · PRJ-24-000902644 · G4</title>
+<style>
+  :root{
+    --navy:#0e1726;--navy-2:#16233a;--ink:#0f172a;--slate:#475569;--slate-2:#64748b;--muted:#94a3b8;
+    --line:#e6eaf0;--line-2:#eef2f7;--bg:#f4f6fa;--card:#fff;
+    --te:#ff6a00;--te-soft:#fff1e6;--blue:#2563eb;--blue-soft:#eaf1ff;
+    --green:#0f9d58;--green-soft:#e7f6ee;--amber:#d98a00;--amber-soft:#fff5e1;
+    --red:#e1442f;--red-soft:#fdecea;--violet:#7c3aed;--teal:#0d9488;
+    --excel:#217346;
+    --radius:14px;--radius-sm:10px;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.18);
+    --font:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC','Microsoft YaHei',sans-serif;
+    --mono:'SF Mono','Cascadia Code',ui-monospace,'Roboto Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--te);color:#fff}
+  *::-webkit-scrollbar{width:9px;height:9px}
+  *::-webkit-scrollbar-thumb{background:#c7d0dd;border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+  *::-webkit-scrollbar-thumb:hover{background:#aab6c7;background-clip:padding-box}
+  *::-webkit-scrollbar-track{background:transparent}
+
+  .app{display:grid;grid-template-columns:248px 1fr;height:100vh;overflow:hidden}
+  /* sidebar */
+  .sidebar{background:linear-gradient(180deg,var(--navy),#0b1320);color:#cbd5e1;display:flex;flex-direction:column;min-height:0;border-right:1px solid #0a101c}
+  .brand{display:flex;align-items:center;gap:11px;padding:18px 18px 16px}
+  .brand .logo{width:34px;height:34px;border-radius:9px;flex:none;background:linear-gradient(135deg,var(--te),#ff9248);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px;box-shadow:0 6px 16px -6px rgba(255,106,0,.7)}
+  .brand .name{font-size:15px;font-weight:700;color:#fff}
+  .brand .sub{font-size:10.5px;color:#7e8aa0;letter-spacing:.6px;text-transform:uppercase}
+  .nav{padding:6px 12px;overflow-y:auto;flex:1;min-height:0}
+  .nav-group{margin-top:14px}
+  .nav-group .gl{font-size:10px;font-weight:700;letter-spacing:1px;color:#5d6b85;text-transform:uppercase;padding:6px 12px}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:#aab6cb;cursor:pointer;font-size:12.5px;font-weight:500;position:relative;transition:.15s;user-select:none}
+  .nav-item .ico{width:17px;height:17px;flex:none;opacity:.85}
+  .nav-item .badge{margin-left:auto;font-size:10px;background:#243250;color:#9fb0cc;padding:1px 7px;border-radius:20px;font-weight:700}
+  .nav-item:hover{background:#16233a;color:#e6ecf5}
+  .nav-item.active{background:linear-gradient(90deg,rgba(255,106,0,.16),rgba(255,106,0,.02));color:#fff}
+  .nav-item.active::before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:3px;background:var(--te)}
+  .side-foot{padding:12px;border-top:1px solid #1b2740}
+  .userbox{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:10px;cursor:pointer}
+  .userbox:hover{background:#16233a}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:none}
+  .userbox .un{font-size:12.5px;color:#e6ecf5;font-weight:600}
+  .userbox .ur{font-size:10.5px;color:#7e8aa0}
+
+  .main{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .topbar{height:56px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 22px;flex:none}
+  .crumbs{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--slate-2)}
+  .crumbs b{color:var(--ink);font-weight:600}
+  .crumbs .sep{color:#cbd5e1}
+  .switcher{margin-left:auto;display:flex;gap:0;background:#f1f4f9;border-radius:9px;padding:3px}
+  .switcher a{text-decoration:none;font-size:11.5px;font-weight:600;color:var(--slate-2);padding:6px 13px;border-radius:7px;display:flex;align-items:center;gap:6px}
+  .switcher a.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--slate)}
+  .icon-btn:hover{background:#f6f8fc}
+
+  .req-head{background:var(--card);border-bottom:1px solid var(--line);padding:15px 22px 0;flex:none}
+  .rh-top{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .rh-id{font-family:var(--mono);font-size:11.5px;color:var(--te);font-weight:700;letter-spacing:.5px}
+  .rh-name{font-size:18px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:5px}
+  .rh-meta{display:flex;align-items:center;gap:15px;flex-wrap:wrap;font-size:12px;color:var(--slate-2);margin-top:5px}
+  .rh-meta .m b{color:var(--ink);font-weight:600}
+  .rh-right{margin-left:auto;display:flex;align-items:center;gap:9px}
+  .btn{height:36px;padding:0 15px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:.15s}
+  .btn:hover{background:#f6f8fc;border-color:#d7e0ee}
+  .btn.primary{background:linear-gradient(135deg,var(--te),#ff8a33);color:#fff;border-color:transparent;box-shadow:0 8px 18px -8px rgba(255,106,0,.6)}
+  .btn.excel{background:var(--excel);color:#fff;border-color:transparent}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .badge .bdot{width:6px;height:6px;border-radius:50%}
+  .b-review{background:var(--amber-soft);color:#a86a00}
+  .b-review .bdot{background:var(--amber)}
+
+  /* gate progress */
+  .gates{display:flex;align-items:center;gap:0;margin-top:13px;padding-bottom:2px}
+  .gate{display:flex;align-items:center;gap:9px;flex:none}
+  .gate .gc{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;border:2px solid var(--line);background:#fff;color:var(--slate-2)}
+  .gate.done .gc{background:var(--green);color:#fff;border-color:var(--green)}
+  .gate.cur .gc{background:var(--te);color:#fff;border-color:var(--te);box-shadow:0 0 0 4px var(--te-soft)}
+  .gate .gl{display:flex;flex-direction:column;line-height:1.25}
+  .gate .gl b{font-size:12px}
+  .gate .gl small{font-size:10px;color:var(--muted)}
+  .gate-line{width:46px;height:2px;background:var(--line);margin:0 6px}
+  .gate-line.done{background:var(--green)}
+
+  .tabs{display:flex;gap:2px;margin-top:14px;overflow-x:auto}
+  .tab{padding:11px 14px;font-size:12.5px;font-weight:600;color:var(--slate-2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:7px}
+  .tab .xs{font-family:var(--mono);font-size:9.5px;background:#eef1f6;color:var(--slate-2);border-radius:5px;padding:1px 5px;font-weight:700}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--te);border-bottom-color:var(--te)}
+  .tab.active .xs{background:var(--te-soft);color:var(--te)}
+
+  .content{flex:1;overflow-y:auto;min-height:0;padding:20px 22px 60px}
+  .panel{display:none;animation:fade .25s}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .grid{display:grid;gap:16px}
+  .kpis{grid-template-columns:repeat(6,1fr)}
+  @media(max-width:1400px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 15px;box-shadow:var(--shadow);position:relative}
+  .kpi .kl{font-size:10.5px;color:var(--slate-2);font-weight:600;letter-spacing:.3px}
+  .kpi .kv{font-size:22px;font-weight:800;margin-top:7px;letter-spacing:-.5px;font-feature-settings:"tnum"}
+  .kpi .kv small{font-size:12px;font-weight:600;color:var(--slate-2)}
+  .kpi .kd{font-size:10.5px;margin-top:4px;color:var(--muted)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+  .card-h{display:flex;align-items:center;gap:11px;padding:13px 18px;border-bottom:1px solid var(--line-2)}
+  .card-h h3{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:9px}
+  .card-h .ch-ico{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;background:var(--te-soft);color:var(--te)}
+  .card-h .sub{font-size:11px;color:var(--muted);font-weight:500}
+  .card-h .xls{margin-left:auto;font-family:var(--mono);font-size:10px;color:#fff;background:var(--excel);padding:2px 8px;border-radius:6px;font-weight:700;display:flex;align-items:center;gap:5px}
+  .card-h .ha{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .card-b{padding:18px}
+  .card-b.np{padding:0}
+
+  .chip{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px;background:#f1f4f9;color:var(--slate)}
+  .chip.te{background:var(--te-soft);color:var(--te)}
+  .chip.bl{background:var(--blue-soft);color:var(--blue)}
+  .chip.gr{background:var(--green-soft);color:var(--green)}
+  .chip.vi{background:#f3ecff;color:var(--violet)}
+
+  .specs{display:grid;gap:1px;background:var(--line-2);border:1px solid var(--line-2)}
+  .spec{background:#fff;padding:11px 14px}
+  .spec .sl{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.2px;text-transform:uppercase}
+  .spec .sv{font-size:13px;color:var(--ink);font-weight:600;margin-top:3px}
+  .spec .sv.mono{font-family:var(--mono);font-size:12px}
+  .spec.inp{background:#fffdf8}
+  .spec.inp .sv{color:#a86a00}
+
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{text-align:left;font-size:10.5px;letter-spacing:.3px;text-transform:uppercase;color:var(--slate-2);font-weight:700;padding:9px 13px;background:#fafbfd;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;z-index:2}
+  thead th.r,td.r{text-align:right;font-family:var(--mono);font-feature-settings:"tnum"}
+  thead th.c,td.c{text-align:center}
+  tbody td{padding:8px 13px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+  tbody tr:hover{background:#f8fafd}
+  td .pn{font-family:var(--mono);font-size:11px;color:var(--slate)}
+  tr.subtotal td{font-weight:700;background:#f6f8fc;border-top:1px solid var(--line)}
+  tr.grandtotal td{background:#0e1726;color:#fff;font-weight:800;border:none}
+  tr.section-row td{background:#eef3fb;font-weight:700;color:var(--blue);text-transform:uppercase;font-size:10.5px;letter-spacing:.4px}
+  tr.hl td{background:#fff8ee}
+  tr.hl td:first-child{font-weight:700}
+
+  .pill{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+  .pill.ok{background:var(--green-soft);color:#0a7a44}
+  .pill.chk{background:var(--amber-soft);color:#a86a00}
+  .pill.gy{background:#eef1f6;color:var(--slate)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .two-a{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:1100px){.two,.two-a,.three{grid-template-columns:1fr}}
+
+  .section-title{font-size:11.5px;font-weight:700;color:var(--slate-2);letter-spacing:.5px;text-transform:uppercase;margin:6px 2px 12px;display:flex;align-items:center;gap:9px}
+  .section-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .note{display:flex;gap:10px;background:var(--blue-soft);border:1px solid #d4e2ff;border-radius:11px;padding:12px 14px;font-size:12px;color:#1e40af}
+  .note.warn{background:var(--amber-soft);border-color:#f3dca6;color:#92600a}
+  .note .ni{flex:none}
+
+  /* checklist */
+  .chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-2);border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
+  .chk-col{background:#fff}
+  .chk-head{font-size:11px;font-weight:700;color:#fff;background:var(--navy-2);padding:8px 14px;letter-spacing:.3px}
+  .chk-item{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--line-2);font-size:12px}
+  .chk-item:last-child{border-bottom:none}
+  .chk-item .ci{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:10px;font-weight:800}
+  .chk-item .ci.ok{background:var(--green-soft);color:var(--green)}
+  .chk-item .ci.chk{background:var(--amber-soft);color:var(--amber)}
+  .chk-item .nm{flex:1;color:var(--ink)}
+
+  /* process tree */
+  .ptree td .ind{display:inline-flex;align-items:center;gap:8px}
+  .level-asm td:first-child{font-weight:700}
+  .level-proc td:first-child{padding-left:30px;font-weight:600;color:var(--blue)}
+  .level-comp td:first-child{padding-left:54px;color:var(--slate)}
+  .pico{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:9px;font-weight:800;flex:none}
+  .caret{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:4px;cursor:pointer;color:var(--slate-2)}
+  .caret.open{transform:rotate(90deg)}
+  .caret:hover{background:#eef1f6}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:11.5px;color:var(--slate)}
+  .legend .lg{display:flex;align-items:center;gap:7px}
+  .legend .sw{width:11px;height:11px;border-radius:3px}
+  .ann{font-size:11px;color:var(--muted);margin-top:9px;display:flex;align-items:center;gap:6px}
+
+  .donut-legend{display:flex;flex-direction:column;gap:8px}
+  .dl-row{display:flex;align-items:center;gap:10px;font-size:12px}
+  .dl-row .sw{width:10px;height:10px;border-radius:3px;flex:none}
+  .dl-row .nm{color:var(--slate);flex:1}
+  .dl-row .vl{font-family:var(--mono);font-weight:700}
+  .dl-row .pc{font-family:var(--mono);color:var(--muted);width:40px;text-align:right}
+
+  .stat-strip{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;margin-bottom:16px}
+  .stat-strip .ss{flex:1;padding:12px 15px;border-right:1px solid var(--line-2)}
+  .stat-strip .ss:last-child{border-right:none}
+  .stat-strip .ssl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase}
+  .stat-strip .ssv{font-size:18px;font-weight:800;margin-top:3px;font-feature-settings:"tnum"}
+  .stat-strip .ssc{font-size:10px;color:var(--muted);margin-top:1px}
+
+  /* workbook tabs */
+  .wb-tabs{position:sticky;bottom:0;background:#f0f2f6;border-top:1px solid #d7dce4;display:flex;align-items:stretch;gap:0;padding:0 12px;overflow-x:auto;height:34px;flex:none}
+  .wb-tab{display:flex;align-items:center;padding:0 13px;font-size:11px;color:var(--slate-2);border-right:1px solid #dfe3ea;cursor:pointer;white-space:nowrap;background:#e7eaf0;border-top:2px solid transparent}
+  .wb-tab:hover{background:#eef0f4}
+  .wb-tab.on{background:#fff;color:var(--excel);font-weight:700;border-top-color:var(--excel)}
+  .wb-tab.hidden-sheet{color:#b3bccb;font-style:italic}
+
+  .seg{display:inline-flex;background:#f1f4f9;border-radius:9px;padding:3px;gap:2px}
+  .seg button{border:none;background:transparent;font-size:11.5px;font-weight:600;color:var(--slate-2);padding:5px 11px;border-radius:7px;cursor:pointer}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .tag-row{display:flex;gap:7px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">TE</div><div><div class="name">CER Cockpit</div><div class="sub">Capital Expenditure</div></div></div>
+    <nav class="nav">
+      <div class="nav-group">
+        <div class="gl">工作区</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>仪表盘</div>
+        <div class="nav-item active"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 16h6M9 8h2"/><rect x="4" y="3" width="16" height="18" rx="2"/></svg>CER 申请<span class="badge">18</span></div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>审批待办<span class="badge">5</span></div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>财务分析</div>
+      </div>
+      <div class="nav-group">
+        <div class="gl">主数据</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg>项目库</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>成品 & BOM</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v4a1 1 0 001 1h4"/><path d="M5 3h9l5 5v11a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>模具 & 设备台账</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L9 18l-5-5"/></svg>原材料价格库</div>
+      </div>
+    </nav>
+    <div class="side-foot"><div class="userbox"><div class="avatar">TT</div><div style="flex:1;min-width:0"><div class="un">Tim Tang</div><div class="ur">Cost Engineering · APAC</div></div></div></div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="crumbs"><span>CER 申请</span><span class="sep">/</span><span>China · Charging Inlet</span><span class="sep">/</span><b>PRJ-24-000902644</b></div>
+      <div class="switcher">
+        <a href="cer-cockpit-poc.html">① Cockpit 概念稿</a>
+        <a class="on" href="cer-template-replica.html">② Excel 模板复刻</a>
+      </div>
+      <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+
+    <!-- request header -->
+    <div class="req-head">
+      <div class="rh-top">
+        <div>
+          <div class="rh-id">PRJ-24-000902644 · CER Workbook 202410 V1</div>
+          <div class="rh-name">Charging Inlet — Gen 2 GB Actuator-P
+            <span class="badge b-review"><span class="bdot"></span>G4 · 量产投资审批</span>
+            <span class="chip te">NPI</span><span class="chip bl">Localization</span>
+          </div>
+          <div class="rh-meta">
+            <span class="m">成品 <b>2483376-1</b> · ACTUATOR, GEN2 ASSY</span>
+            <span class="m">客户 <b>Geely</b> (OEM Geely-Geely)</span>
+            <span class="m">工厂 <b>NEPZ</b></span>
+            <span class="m">产品线 <b>China · Charging Inlet</b></span>
+            <span class="m">SOP <b>2026-03-30</b></span>
+            <span class="m">生命周期 <b>5 yr</b></span>
+            <span class="m">FX <b>7.24218</b> CNY/USD</span>
+          </div>
+        </div>
+        <div class="rh-right">
+          <button class="btn excel"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v4a1 1 0 001 1h4M5 3h9l5 5v11a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/><path d="M8 13l3 4M11 13l-3 4"/></svg>源 Excel</button>
+          <button class="btn">导出 PAC</button>
+          <button class="btn primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>提交 G4 审批</button>
+        </div>
+      </div>
+
+      <!-- gate progression -->
+      <div class="gates">
+        <div class="gate done"><div class="gc">✓</div><div class="gl"><b>G2</b><small>报价批准</small></div></div>
+        <div class="gate-line done"></div>
+        <div class="gate done"><div class="gc">✓</div><div class="gl"><b>G3</b><small>Capex 批准</small></div></div>
+        <div class="gate-line done"></div>
+        <div class="gate cur"><div class="gc">G4</div><div class="gl"><b>G4 当前</b><small>量产投资审批</small></div></div>
+        <div class="gate-line"></div>
+        <div class="gate"><div class="gc">G5</div><div class="gl"><b>G5</b><small>量产后复盘</small></div></div>
+      </div>
+
+      <!-- tabs map to Excel sheets -->
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-tab="summary">汇总 & 检查 <span class="xs">CHECK LIST</span></div>
+        <div class="tab" data-tab="info">项目信息 <span class="xs">INFO</span></div>
+        <div class="tab" data-tab="sales">销量 & 价格 <span class="xs">SALES</span></div>
+        <div class="tab" data-tab="capex">投资 <span class="xs">CAPEX</span></div>
+        <div class="tab" data-tab="cost">成本 & 工艺 <span class="xs">2483376-1</span></div>
+        <div class="tab" data-tab="pnl">财务 P&amp;L <span class="xs">CER P&L</span></div>
+        <div class="tab" data-tab="metrics">指标 & 敏感性 <span class="xs">Data for PAC</span></div>
+        <div class="tab" data-tab="assum">假设参数 <span class="xs">Financial Index</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="content">
+
+      <!-- ===== SUMMARY & CHECK LIST ===== -->
+      <section class="panel active" id="summary">
+        <div class="grid kpis" style="margin-bottom:16px">
+          <div class="kpi"><div class="kl">总投资 (Capital)</div><div class="kv">¥1.72<small>M</small></div><div class="kd">$237.7K · TE 一次性买断</div></div>
+          <div class="kpi"><div class="kl">研发/工装费用 (Expense)</div><div class="kv">¥0.83<small>M</small></div><div class="kd">$114.6K · 软模+DV/PV</div></div>
+          <div class="kpi"><div class="kl">生命周期销售额</div><div class="kv">$17.1<small>M</small></div><div class="kd">5 年 · 460万件</div></div>
+          <div class="kpi"><div class="kl">营业利润率 OI%</div><div class="kv" style="color:var(--green)">36.8<small>%</small></div><div class="kd">标准毛利 41.0%</div></div>
+          <div class="kpi"><div class="kl">回收期 Payback</div><div class="kv">0.56<small>yr</small></div><div class="kd">ROIC 92.4%</div></div>
+          <div class="kpi"><div class="kl">NPV @ WACC 10.5%</div><div class="kv" style="color:var(--green)">$4.67<small>M</small></div><div class="kd">IRR 极高 (轻资产)</div></div>
+        </div>
+
+        <div class="two-a">
+          <div class="card">
+            <div class="card-h"><h3><span class="ch-ico" style="background:var(--green-soft);color:var(--green)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>校验汇总报告 (Summary Report)</h3><span class="xls">CHECK LIST</span></div>
+            <div class="card-b">
+              <div class="chk-grid">
+                <div class="chk-col">
+                  <div class="chk-head">Sales Check</div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">1. Sales Volume Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">2. Product Sales Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">3. Customer Contributed Sales</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">4. Total Sales Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">5. Original Project Number</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci chk">!</span><span class="nm">6. SOP Date Check</span><span class="pill chk">CHECK</span></div>
+                </div>
+                <div class="chk-col">
+                  <div class="chk-head">MFG Cost Check</div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Material Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Labor & Overhead Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Freight & Duty Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Investment Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Depreciation Life (5 / 5)</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Investment-Assets Cross Check</span><span class="pill ok">OK</span></div>
+                </div>
+                <div class="chk-col">
+                  <div class="chk-head">Expenses Check</div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Growth Engineering Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Soft Tooling Expense Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Other Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci chk">!</span><span class="nm">Safelaunch Cost</span><span class="pill chk">CHECK</span></div>
+                </div>
+                <div class="chk-col">
+                  <div class="chk-head">Operating Result & Working Capital</div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Operating Income Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Operating Income (% of Sales)</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Inventory / AR / AP Check</span><span class="pill ok">OK</span></div>
+                  <div class="chk-item"><span class="ci ok">✓</span><span class="nm">Net Working Capital Check</span><span class="pill ok">OK</span></div>
+                </div>
+              </div>
+              <div class="note warn" style="margin-top:14px"><svg class="ni" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div>有 2 项待复核：<b>SOP Date</b> 与 <b>Safelaunch Cost</b>。Excel 原表要求在提交 G4 审批前所有项目须为 <b>OK</b>。</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>Gate 审批签核</h3></div>
+            <div class="card-b np">
+              <div class="specs" style="grid-template-columns:1fr">
+                <div class="spec"><div class="sl">G2 / Sustaining / Lite — 报价批准</div><div class="sv" style="color:var(--green)">✓ 已批准</div></div>
+                <div class="spec"><div class="sl">G3 / Lite — Capex 批准</div><div class="sv" style="color:var(--green)">✓ 已批准</div></div>
+                <div class="spec inp"><div class="sl">G4 审批 — 当前节点</div><div class="sv">⏳ 审批中 · 财务复核</div></div>
+                <div class="spec"><div class="sl">G5 审批 — 量产后</div><div class="sv" style="color:var(--muted)">待量产后启动</div></div>
+              </div>
+              <div style="padding:16px"><div class="note"><svg class="ni" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div>本 CER 为 <b>NPI 本地化 (Localization)</b> 项目，投资以国产化替代为主，因此投资额小、回收快。</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="card">
+            <div class="card-h"><h3><span class="ch-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-9-9v9z"/></svg></span>制造成本构成 (单件 $2.20)</h3><span class="xls">CER P&L</span></div>
+            <div class="card-b" style="display:flex;align-items:center;gap:18px">
+              <div id="costDonut"></div>
+              <div class="donut-legend" style="flex:1">
+                <div class="dl-row"><span class="sw" style="background:#2563eb"></span><span class="nm">Material 材料</span><span class="vl">$1.766</span><span class="pc">80.3%</span></div>
+                <div class="dl-row"><span class="sw" style="background:#0f9d58"></span><span class="nm">Labor 直接人工</span><span class="vl">$0.195</span><span class="pc">8.9%</span></div>
+                <div class="dl-row"><span class="sw" style="background:#7c3aed"></span><span class="nm">Overhead 制造费用</span><span class="vl">$0.134</span><span class="pc">6.1%</span></div>
+                <div class="dl-row"><span class="sw" style="background:#ff6a00"></span><span class="nm">Capital Depreciation 折旧</span><span class="vl">$0.052</span><span class="pc">2.4%</span></div>
+                <div class="dl-row"><span class="sw" style="background:#d98a00"></span><span class="nm">Freight & Duty 运费关税</span><span class="vl">$0.042</span><span class="pc">1.9%</span></div>
+                <div class="dl-row"><span class="sw" style="background:#94a3b8"></span><span class="nm">Sustaining Eng 维持工程</span><span class="vl">$0.010</span><span class="pc">0.5%</span></div>
+              </div>
+            </div>
+            <div style="padding:0 18px 14px"><div class="ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>材料占比高达 80%（13 个外购件本地化），是成本与利润的核心驱动。</div></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3><span class="ch-ico" style="background:var(--green-soft);color:var(--green)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></span>累计现金流 & 回收期</h3><span class="xls">Data for PAC</span></div>
+            <div class="card-b" id="cashChart"></div>
+            <div style="padding:0 18px 14px"><div class="ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>初始投资 $237.7K，约 0.56 年回收（考虑实际 PO 日期 1.30 年）。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== INFO ===== -->
+      <section class="panel" id="info">
+        <div class="card">
+          <div class="card-h"><h3><span class="ch-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg></span>项目主数据 (Project Master Inputs)</h3><span class="xls">INFO</span></div>
+          <div class="card-b np">
+            <div class="specs" style="grid-template-columns:repeat(4,1fr)">
+              <div class="spec"><div class="sl">Gate</div><div class="sv">G4</div></div>
+              <div class="spec"><div class="sl">Project #</div><div class="sv mono">PRJ-24-000902644</div></div>
+              <div class="spec"><div class="sl">Project Name</div><div class="sv">Charging Inlet-Gen 2 GB actuator-P</div></div>
+              <div class="spec"><div class="sl">Project Type / Category</div><div class="sv">Type 0 · NPI</div></div>
+              <div class="spec"><div class="sl">Part Number</div><div class="sv mono">2483376-1</div></div>
+              <div class="spec"><div class="sl">Description</div><div class="sv">ACTUATOR, GEN2 ACTUATOR ASSY</div></div>
+              <div class="spec"><div class="sl">Product Line</div><div class="sv">China · Charging Inlet</div></div>
+              <div class="spec"><div class="sl">Application</div><div class="sv">Charging Inlet</div></div>
+              <div class="spec"><div class="sl">Platform / Customer</div><div class="sv">Platform</div></div>
+              <div class="spec"><div class="sl">Direct Customer</div><div class="sv">Geely</div></div>
+              <div class="spec"><div class="sl">OEM</div><div class="sv">Geely-Geely</div></div>
+              <div class="spec"><div class="sl">Shipment Region / Plant</div><div class="sv">CN · NEPZ</div></div>
+              <div class="spec"><div class="sl">Life</div><div class="sv">5 years</div></div>
+              <div class="spec"><div class="sl">SOP Date</div><div class="sv">2026-03-30</div></div>
+              <div class="spec"><div class="sl">SOP Fiscal Year</div><div class="sv">FY2026</div></div>
+              <div class="spec"><div class="sl">Interco Transfer</div><div class="sv">N</div></div>
+              <div class="spec"><div class="sl">Reporting Currency / FX</div><div class="sv mono">CNY · 7.24218 → USD</div></div>
+              <div class="spec"><div class="sl">Initial TE Capex PO Month</div><div class="sv">2024-12-30</div></div>
+              <div class="spec"><div class="sl">No. of P0 cash-out periods</div><div class="sv">2</div></div>
+              <div class="spec"><div class="sl">Total depreciation months</div><div class="sv">55 (SOP P1: 7 mo + 4×12 mo)</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-a">
+          <div class="card">
+            <div class="card-h"><h3>Proposed Sales — 12 期录入 (CNY)</h3><span class="xls">INFO!D26</span></div>
+            <div class="card-b np" style="overflow-x:auto">
+              <table>
+                <thead><tr><th>Period</th><th class="r">Volume (pcs)</th><th class="r">Unit Price (CNY)</th><th class="r">Product Sales (CNY)</th></tr></thead>
+                <tbody>
+                  <tr><td>Period 1 <span class="chip gy">SOP 7 mo</span></td><td class="r">600,000</td><td class="r">27.00</td><td class="r">16,200,000</td></tr>
+                  <tr><td>Period 2</td><td class="r">1,000,000</td><td class="r">27.00</td><td class="r">27,000,000</td></tr>
+                  <tr><td>Period 3</td><td class="r">1,000,000</td><td class="r">27.00</td><td class="r">27,000,000</td></tr>
+                  <tr><td>Period 4</td><td class="r">1,000,000</td><td class="r">27.00</td><td class="r">27,000,000</td></tr>
+                  <tr><td>Period 5</td><td class="r">1,000,000</td><td class="r">27.00</td><td class="r">27,000,000</td></tr>
+                  <tr class="grandtotal"><td>TTL Proposed</td><td class="r">4,600,000</td><td class="r">27.00</td><td class="r">124,200,000</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:12px 16px"><div class="ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>无年降价假设；单价 27 CNY ≈ $3.728/ea。Period 1 仅 7 个月产出。</div></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>Proposed 经济性 (CNY)</h3><span class="xls">INFO!D43</span></div>
+            <div class="card-b np">
+              <table>
+                <tbody>
+                  <tr><td>Volume</td><td class="r">4,600,000 pcs</td></tr>
+                  <tr><td>Product Sales</td><td class="r">¥124,200,000</td></tr>
+                  <tr class="hl"><td>Unit Cost</td><td class="r">¥16.24</td></tr>
+                  <tr><td>Exw Cost</td><td class="r">¥74,691,717</td></tr>
+                  <tr><td>Freight (1.6%)</td><td class="r">¥1,195,067</td></tr>
+                  <tr class="subtotal"><td>TTL Cost</td><td class="r">¥75,886,785</td></tr>
+                  <tr class="grandtotal"><td>Margin %</td><td class="r">38.9%</td></tr>
+                </tbody>
+              </table>
+              <div style="padding:14px 16px"><div class="note"><svg class="ni" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div>INFO 页是整个 workbook 的<b>输入中枢</b>，下游 SALES / CAPEX / P&amp;L / Depreciation 全部引用此处假设。</div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SALES ===== -->
+      <section class="panel" id="sales">
+        <div class="stat-strip">
+          <div class="ss"><div class="ssl">生命周期销量</div><div class="ssv">4.60M pcs</div><div class="ssc">5 期 · 峰值 1.0M/期</div></div>
+          <div class="ss"><div class="ssl">生命周期销售额</div><div class="ssv">$17.15M</div><div class="ssc">¥124.2M @ 7.24</div></div>
+          <div class="ss"><div class="ssl">加权单价</div><div class="ssv">$3.728</div><div class="ssc">¥27.00 / ea</div></div>
+          <div class="ss"><div class="ssl">增量销售额</div><div class="ssv">$9.20M</div><div class="ssc">vs 现有方案</div></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3><span class="ch-ico" style="background:var(--blue-soft);color:var(--blue)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></span>逐期销量 & 销售额预测 (USD)</h3><div class="ha"><span class="seg"><button class="on">USD</button><button>CNY</button></span><span class="xls">SALES proposed</span></div></div>
+          <div class="card-b" id="salesChart"></div>
+          <div class="card-b np" style="border-top:1px solid var(--line-2);overflow-x:auto">
+            <table>
+              <thead><tr><th>维度</th><th class="r">P1 (FY26)</th><th class="r">P2 (FY27)</th><th class="r">P3 (FY28)</th><th class="r">P4 (FY29)</th><th class="r">P5 (FY30)</th><th class="r" style="background:#0e1726;color:#fff">合计</th></tr></thead>
+              <tbody>
+                <tr><td>Forecast Sales Units (pcs)</td><td class="r">1,016,667</td><td class="r">1,000,000</td><td class="r">1,000,000</td><td class="r">1,000,000</td><td class="r">583,333</td><td class="r" style="background:#f6f8fc;font-weight:700">4,600,000</td></tr>
+                <tr><td>Weighted Avg Selling Price ($)</td><td class="r">3.728</td><td class="r">3.728</td><td class="r">3.728</td><td class="r">3.728</td><td class="r">3.728</td><td class="r" style="background:#f6f8fc;font-weight:700">3.728</td></tr>
+                <tr class="hl"><td>Forecast Sales ($)</td><td class="r">3,790,295</td><td class="r">3,728,159</td><td class="r">3,728,159</td><td class="r">3,728,159</td><td class="r">2,174,760</td><td class="r" style="font-weight:700">17,149,532</td></tr>
+                <tr><td>Customer Contributed Sales ($)</td><td class="r">0</td><td class="r">0</td><td class="r">0</td><td class="r">0</td><td class="r">0</td><td class="r" style="background:#f6f8fc">0</td></tr>
+                <tr class="grandtotal"><td>Total Overall Sales ($)</td><td class="r">3,790,295</td><td class="r">3,728,159</td><td class="r">3,728,159</td><td class="r">3,728,159</td><td class="r">2,174,760</td><td class="r">17,149,532</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:12px 18px"><div class="ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>P1 跨财年含 SOP 后 7 个月 + 上一财年结转，故单元数 1,016,667 略高于年化；P5 为生命末期残量 583,333。</div></div>
+        </div>
+      </section>
+
+      <!-- ===== CAPEX ===== -->
+      <section class="panel" id="capex">
+        <div class="stat-strip">
+          <div class="ss"><div class="ssl">DIE 冲压模</div><div class="ssv" style="color:var(--te)">¥0.40M</div><div class="ssc">$54.7K · 4 项</div></div>
+          <div class="ss"><div class="ssl">MOLD 注塑模</div><div class="ssv" style="color:var(--blue)">¥1.33M</div><div class="ssc">$183.0K · 10 项</div></div>
+          <div class="ss"><div class="ssl">PACKING / ASS'Y</div><div class="ssv" style="color:var(--slate-2)">¥0</div><div class="ssc">本项目无</div></div>
+          <div class="ss"><div class="ssl">Capital 合计</div><div class="ssv">¥1.72M</div><div class="ssc">$237.7K</div></div>
+          <div class="ss"><div class="ssl">Expense (Others)</div><div class="ssv" style="color:var(--violet)">¥0.83M</div><div class="ssc">$114.6K</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3><span class="ch-ico" style="background:var(--blue-soft);color:var(--blue)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg></span>[MOLD] 注塑模具投资</h3><span class="xls">CAPEX!A21</span></div>
+          <div class="card-b np" style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Description</th><th>P/N</th><th>Mold No.</th><th class="c">Ownership</th><th class="r">Capitalize RM (CNY)</th><th class="r">Total (CNY)</th></tr></thead>
+              <tbody>
+                <tr><td>ACTUATOR, GEN2 HSG</td><td class="pn">2483257-1</td><td class="pn">2483257-1/2</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">20,000</td><td class="r">657,260</td></tr>
+                <tr><td>ACTUATOR, RELEASE LEVER</td><td class="pn">2483349-1</td><td class="pn">2483349-1/2</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">9,050</td><td class="r">89,050</td></tr>
+                <tr><td>ACTUATOR, GEN2 COVER</td><td class="pn">2483380-1</td><td class="pn">2483380-1/2</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">9,000</td><td class="r">79,000</td></tr>
+                <tr><td>ACTUATOR, GEAR STAGE1</td><td class="pn">2483331-1</td><td class="pn">2483331-1</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">9,000</td><td class="r">69,000</td></tr>
+                <tr><td>ACTUATOR, GEAR STAGE2</td><td class="pn">2483346-1</td><td class="pn">2483346-1</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">7,000</td><td class="r">67,000</td></tr>
+                <tr><td>ACTUATOR, GEAR STAGE3</td><td class="pn">2483348-1</td><td class="pn">2483348-1</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">7,000</td><td class="r">67,000</td></tr>
+                <tr><td>ACTUATOR, SEALING UNLOCK</td><td class="pn">2483371-1</td><td class="pn">2483371-1</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">10,000</td><td class="r">110,000</td></tr>
+                <tr><td>ACTUATOR, CLIP</td><td class="pn">2483372-1</td><td class="pn">2483372-1</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">3,500</td><td class="r">38,500</td></tr>
+                <tr><td>ACTUATOR, RELEASE ADAPTER</td><td class="pn">2483373-1</td><td class="pn">2483373-1</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">3,500</td><td class="r">38,500</td></tr>
+                <tr><td>PIN SEALING</td><td class="pn">2486732-1</td><td class="pn">2486732-1</td><td class="c"><span class="chip bl">TE 一次性</span></td><td class="r">10,000</td><td class="r">110,000</td></tr>
+                <tr class="grandtotal"><td colspan="4">Mold Sub-total</td><td class="r">88,050</td><td class="r">1,325,310 ($183.0K)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="card">
+            <div class="card-h"><h3><span class="ch-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>[DIE] 冲压模 / 外购</h3><span class="xls">CAPEX!A11</span></div>
+            <div class="card-b np" style="overflow-x:auto">
+              <table>
+                <thead><tr><th>Description</th><th>P/N</th><th class="c">Own.</th><th class="r">Total (CNY)</th></tr></thead>
+                <tbody>
+                  <tr><td>ACTUATOR, CONTACT SPRING</td><td class="pn">2483369-1</td><td class="c">TE</td><td class="r">120,823.87</td></tr>
+                  <tr><td>ACTUATOR, 130 MOTOR</td><td class="pn">2483291-1</td><td class="c">TE</td><td class="r">118,823.87</td></tr>
+                  <tr><td>ACTUATOR, MOTOR GEAR</td><td class="pn">2483296-1</td><td class="c">TE</td><td class="r">38,000.00</td></tr>
+                  <tr><td>ACTUATOR, GREASE (BECHEM)</td><td class="pn">2498664-1</td><td class="c">TE</td><td class="r">118,823.87</td></tr>
+                  <tr class="grandtotal"><td colspan="3">Die Sub-total</td><td class="r">396,471.61 ($54.7K)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3><span class="ch-ico" style="background:#f3ecff;color:var(--violet)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></span>[OTHERS] 费用化支出 (Expense)</h3><span class="xls">CAPEX!A51</span></div>
+            <div class="card-b np" style="overflow-x:auto">
+              <table>
+                <thead><tr><th>Item</th><th class="c">类型</th><th class="r">Expense (CNY)</th></tr></thead>
+                <tbody>
+                  <tr><td>Engineer Hour 工程工时</td><td class="c"><span class="chip">Growth Eng</span></td><td class="r">20,000</td></tr>
+                  <tr><td>Soft Tooling 软模</td><td class="c"><span class="chip">Soft Tool</span></td><td class="r">450,000</td></tr>
+                  <tr><td>DV/PV Test 验证测试</td><td class="c"><span class="chip">Other</span></td><td class="r">360,000</td></tr>
+                  <tr class="grandtotal"><td colspan="2">Expense Sub-total</td><td class="r">830,000 ($114.6K)</td></tr>
+                </tbody>
+              </table>
+              <div style="padding:14px 16px"><div class="note"><svg class="ni" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div>Capital 进入折旧池（55 个月，约 5 年）；Expense 当期费用化，不折旧。所有权均为 <b>TE-Onetime Payment</b>。</div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== COST / PROCESS ===== -->
+      <section class="panel" id="cost">
+        <div class="card">
+          <div class="card-h"><h3><span class="ch-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 16l3-3 3 2 4-5"/></svg></span>工艺流程 & 成本卷积 (Process Sheet)</h3><div class="ha"><div class="legend" style="font-size:11px"><div class="lg"><span class="pico" style="background:var(--te-soft);color:var(--te);width:16px;height:16px;font-size:7px">A</span>成品</div><div class="lg"><span class="pico" style="background:var(--blue-soft);color:var(--blue);width:16px;height:16px;font-size:7px">P</span>工序</div><div class="lg"><span class="pico" style="background:#eef1f6;color:var(--slate);width:16px;height:16px;font-size:7px">C</span>组件</div></div><span class="xls">2483376-1</span></div></div>
+          <div class="card-b np" style="overflow-x:auto">
+            <table class="ptree" id="ptree">
+              <thead><tr><th style="min-width:320px">工艺 / 物料 (Flow → Process → PN)</th><th class="c">Make/Buy</th><th class="c">Material Category</th><th class="r">Q'ty</th><th class="r">Markup</th><th class="r">单件成本估算 ($)</th></tr></thead>
+              <tbody>
+                <tr class="level-asm"><td><span class="ind"><span class="pico" style="background:var(--te-soft);color:var(--te)">A</span><b>2483376-1</b> · ACTUATOR, GEN2 ACTUATOR ASSY</span></td><td class="c">Make</td><td class="c">Final Assy</td><td class="r">1</td><td class="r">—</td><td class="r" style="font-weight:700">$2.198</td></tr>
+
+                <!-- Purchasing process -->
+                <tr class="level-proc" data-grp="pur"><td><span class="ind"><span class="caret open" onclick="tg('pur',this)">▶</span><span class="pico" style="background:var(--blue-soft);color:var(--blue)">P</span>Purchasing 外购 (ECD)</span></td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">13 件</td><td class="r">6.0%</td><td class="r" style="font-weight:700">$1.766</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, GEN2 HSG</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483257-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, CONTACT SPRING</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483369-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, RELEASE LEVER</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483349-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, GEN2 COVER</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483380-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, GEAR STAGE1</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483331-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, GEAR STAGE2</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483346-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, GEAR STAGE3</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483348-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, 130 MOTOR</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483291-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, MOTOR GEAR</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483296-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, SEALING UNLOCK</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483371-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, CLIP</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483372-1</td></tr>
+                <tr class="level-comp row-pur"><td>ACTUATOR, RELEASE ADAPTER</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1</td><td class="r">6.0%</td><td class="r pn">2483373-1</td></tr>
+                <tr class="level-comp row-pur"><td>PIN SEALING / GREASE (BECHEM)</td><td class="c">Buy</td><td class="c">Purchasing</td><td class="r">1+</td><td class="r">6.0%</td><td class="r pn">2486732-1</td></tr>
+
+                <tr class="level-proc"><td><span class="ind"><span class="pico" style="background:var(--blue-soft);color:var(--blue)">P</span>Stamping 冲压</span></td><td class="c">Make</td><td class="c">Stamping</td><td class="r">—</td><td class="r">0%</td><td class="r">—</td></tr>
+                <tr class="level-proc"><td><span class="ind"><span class="pico" style="background:var(--blue-soft);color:var(--blue)">P</span>Plating 电镀</span></td><td class="c">Make</td><td class="c">Plating</td><td class="r">—</td><td class="r">0%</td><td class="r">—</td></tr>
+                <tr class="level-proc"><td><span class="ind"><span class="pico" style="background:var(--blue-soft);color:var(--blue)">P</span>Molding 注塑 (Integrated Mold)</span></td><td class="c">Make</td><td class="c">Molding</td><td class="r">—</td><td class="r">0%</td><td class="r">—</td></tr>
+                <tr class="level-proc"><td><span class="ind"><span class="pico" style="background:var(--blue-soft);color:var(--blue)">P</span>Assembly — Auto Line 1</span></td><td class="c">Make</td><td class="c">Assy Auto</td><td class="r">1 line</td><td class="r">—</td><td class="r" style="font-weight:700">$0.432</td></tr>
+
+                <tr class="grandtotal"><td>成品单件总成本 (Roll-up)</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td class="r">$2.198</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:14px 18px"><div class="ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>原表用 ASCII 框线 (▲┃●┗┻┛) 描绘工艺流程树。此作动器为<b>纯装配 + 外购件</b>结构：13 个子件本地化外购（含 6% markup），经冲压/电镀/注塑/总装工序卷积出 $2.198 单件成本。</div></div>
+        </div>
+        <div class="three">
+          <div class="card"><div class="card-b"><div class="kl" style="font-size:11px;color:var(--slate-2);font-weight:600">Material (外购件)</div><div class="kv" style="font-size:22px;font-weight:800;margin-top:6px">$1.766 <small style="font-size:12px;color:var(--slate-2)">/ 80.3%</small></div><div class="ann">13 个子件本地化</div></div></div>
+          <div class="card"><div class="card-b"><div class="kl" style="font-size:11px;color:var(--slate-2);font-weight:600">Labor + Overhead</div><div class="kv" style="font-size:22px;font-weight:800;margin-top:6px">$0.329 <small style="font-size:12px;color:var(--slate-2)">/ 15.0%</small></div><div class="ann">总装线工时 + OH 费率</div></div></div>
+          <div class="card"><div class="card-b"><div class="kl" style="font-size:11px;color:var(--slate-2);font-weight:600">Depreciation + Freight</div><div class="kv" style="font-size:22px;font-weight:800;margin-top:6px">$0.094 <small style="font-size:12px;color:var(--slate-2)">/ 4.3%</small></div><div class="ann">折旧分摊 + 运费关税</div></div></div>
+        </div>
+      </section>
+
+      <!-- ===== CER P&L ===== -->
+      <section class="panel" id="pnl">
+        <div class="card">
+          <div class="card-h"><h3><span class="ch-ico" style="background:var(--green-soft);color:var(--green)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 16h6M9 8h2"/><rect x="4" y="3" width="16" height="18" rx="2"/></svg></span>Project P&amp;L Summary (USD)</h3><div class="ha"><span class="sub">SOP FY2026 · WACC 10.5%</span><span class="xls">CER P&L</span></div></div>
+          <div class="card-b np" style="overflow-x:auto">
+            <table>
+              <thead><tr>
+                <th style="min-width:260px">Line Item</th><th class="c">Unit</th>
+                <th class="r">Period 0</th><th class="r">Period 1</th><th class="r">Period 2</th><th class="r">Period 3</th><th class="r">Period 4</th><th class="r">Period 5</th>
+                <th class="r" style="background:#0e1726;color:#fff">Lifetime</th>
+              </tr></thead>
+              <tbody>
+                <tr class="section-row"><td colspan="9">Sales</td></tr>
+                <tr><td>Forecast Sales Units</td><td class="c">pcs</td><td class="r">—</td><td class="r">1,016,667</td><td class="r">1,000,000</td><td class="r">1,000,000</td><td class="r">1,000,000</td><td class="r">583,333</td><td class="r" style="font-weight:700">4,600,000</td></tr>
+                <tr><td>Weighted Avg Selling Price</td><td class="c">$/ea</td><td class="r">—</td><td class="r">3.728</td><td class="r">3.728</td><td class="r">3.728</td><td class="r">3.728</td><td class="r">3.728</td><td class="r" style="font-weight:700">3.728</td></tr>
+                <tr class="hl"><td>Total Overall Sales</td><td class="c">$</td><td class="r">0</td><td class="r">3,790,295</td><td class="r">3,728,159</td><td class="r">3,728,159</td><td class="r">3,728,159</td><td class="r">2,174,760</td><td class="r">17,149,532</td></tr>
+
+                <tr class="section-row"><td colspan="9">Manufacturing Cost</td></tr>
+                <tr><td>Material</td><td class="c">$</td><td class="r">—</td><td class="r">1,794,820</td><td class="r">1,765,396</td><td class="r">1,765,396</td><td class="r">1,765,396</td><td class="r">1,029,815</td><td class="r" style="font-weight:700">8,120,823</td></tr>
+                <tr><td>Labor Cost</td><td class="c">$</td><td class="r">—</td><td class="r">198,701</td><td class="r">195,444</td><td class="r">195,444</td><td class="r">195,444</td><td class="r">114,009</td><td class="r" style="font-weight:700">899,041</td></tr>
+                <tr><td>Sustaining Engineering</td><td class="c">$</td><td class="r">—</td><td class="r">10,220</td><td class="r">10,052</td><td class="r">10,052</td><td class="r">10,052</td><td class="r">5,864</td><td class="r" style="font-weight:700">46,239</td></tr>
+                <tr><td>Overhead (incl. existing line Dep)</td><td class="c">$</td><td class="r">—</td><td class="r">135,775</td><td class="r">133,550</td><td class="r">133,550</td><td class="r">133,550</td><td class="r">77,904</td><td class="r" style="font-weight:700">614,329</td></tr>
+                <tr><td>Freight & Duty</td><td class="c">$</td><td class="r">—</td><td class="r">42,954</td><td class="r">42,264</td><td class="r">42,264</td><td class="r">42,264</td><td class="r">24,654</td><td class="r" style="font-weight:700">194,399</td></tr>
+                <tr><td>Capital Depreciation</td><td class="c">$</td><td class="r">—</td><td class="r">51,871</td><td class="r">51,871</td><td class="r">51,871</td><td class="r">51,871</td><td class="r">30,258</td><td class="r" style="font-weight:700">237,743</td></tr>
+                <tr class="subtotal"><td>Total Manufacturing Costs</td><td class="c">$</td><td class="r">0</td><td class="r">2,234,341</td><td class="r">2,198,577</td><td class="r">2,198,577</td><td class="r">2,198,577</td><td class="r">1,282,503</td><td class="r">10,112,574</td></tr>
+                <tr class="hl"><td>Weighted Avg Unit Cost</td><td class="c">$/ea</td><td class="r">—</td><td class="r">2.198</td><td class="r">2.199</td><td class="r">2.199</td><td class="r">2.199</td><td class="r">2.199</td><td class="r">2.199</td></tr>
+                <tr class="hl"><td>Standard Margin</td><td class="c">%</td><td class="r">—</td><td class="r">41.05%</td><td class="r">41.03%</td><td class="r">41.03%</td><td class="r">41.03%</td><td class="r">41.03%</td><td class="r">41.03%</td></tr>
+
+                <tr class="section-row"><td colspan="9">OPEX</td></tr>
+                <tr><td>Sustaining Engineering (OPEX)</td><td class="c">$</td><td class="r">—</td><td class="r">35,408</td><td class="r">34,828</td><td class="r">34,828</td><td class="r">34,828</td><td class="r">20,316</td><td class="r" style="font-weight:700">160,208</td></tr>
+                <tr><td>Distribution and Shipping</td><td class="c">$</td><td class="r">—</td><td class="r">37,903</td><td class="r">37,282</td><td class="r">37,282</td><td class="r">37,282</td><td class="r">21,748</td><td class="r" style="font-weight:700">171,495</td></tr>
+                <tr><td>SG&amp;A</td><td class="c">$</td><td class="r">—</td><td class="r">86,040</td><td class="r">84,629</td><td class="r">84,629</td><td class="r">84,629</td><td class="r">49,367</td><td class="r" style="font-weight:700">389,294</td></tr>
+                <tr class="subtotal"><td>OPEX (GE+SG&A+Sust.+Ship)</td><td class="c">$</td><td class="r">0</td><td class="r">159,351</td><td class="r">156,738</td><td class="r">156,738</td><td class="r">156,738</td><td class="r">91,431</td><td class="r">720,996</td></tr>
+
+                <tr class="grandtotal"><td>Operating Income</td><td class="c">$</td><td class="r">0</td><td class="r">1,396,603</td><td class="r">1,372,844</td><td class="r">1,372,844</td><td class="r">1,372,844</td><td class="r">800,826</td><td class="r">6,315,962</td></tr>
+                <tr class="hl"><td>Operating Income (% of Sales)</td><td class="c">%</td><td class="r">—</td><td class="r">36.85%</td><td class="r">36.82%</td><td class="r">36.82%</td><td class="r">36.82%</td><td class="r">36.82%</td><td class="r">36.83%</td></tr>
+
+                <tr class="section-row"><td colspan="9">Cash Flow</td></tr>
+                <tr><td>Net Working Capital</td><td class="c">$</td><td class="r">—</td><td class="r">999,753</td><td class="r">1,012,k</td><td class="r">1,012,k</td><td class="r">1,012,k</td><td class="r">590,k</td><td class="r">—</td></tr>
+                <tr class="hl"><td>Net Cash Flow</td><td class="c">$</td><td class="r">-237,744</td><td class="r">448,721</td><td class="r">1,440,975</td><td class="r">1,424,716</td><td class="r">1,424,716</td><td class="r">1,240,873</td><td class="r">5,742,257</td></tr>
+                <tr><td>Discounted Cash Flow</td><td class="c">$</td><td class="r">-237,744</td><td class="r">426,870</td><td class="r">1,240,546</td><td class="r">1,109,999</td><td class="r">1,004,524</td><td class="r">791,767</td><td class="r">4,667,243</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note"><svg class="ni" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div>Capital Depreciation 五期合计 = $237,743，<b>恰好等于</b> CAPEX 页的 Capital 总投资——折旧池在生命周期内被完全摊销。这条勾稽关系正是 CHECK LIST 中 "Depreciation Value Check / Investment-Assets Cross Check" 的校验点。</div></div>
+      </section>
+
+      <!-- ===== METRICS & SENSITIVITY ===== -->
+      <section class="panel" id="metrics">
+        <div class="grid kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+          <div class="kpi"><div class="kl">NPV</div><div class="kv" style="color:var(--green)">$4.67<small>M</small></div><div class="kd">@ WACC 10.5%</div></div>
+          <div class="kpi"><div class="kl">Payback (Overall)</div><div class="kv">0.56<small>yr</small></div><div class="kd">考虑实际 PO 日 1.30 yr</div></div>
+          <div class="kpi"><div class="kl">ROIC (Overall)</div><div class="kv" style="color:var(--green)">92.4<small>%</small></div><div class="kd">at tax · 增量 -40.8%</div></div>
+          <div class="kpi"><div class="kl">Avg Standard Margin</div><div class="kv">41.0<small>%</small></div><div class="kd">OI% 36.8%</div></div>
+        </div>
+
+        <div class="two">
+          <div class="card">
+            <div class="card-h"><h3>财务指标 — TE Project vs CER P&amp;L</h3><span class="xls">Data for PAC</span></div>
+            <div class="card-b np" style="overflow-x:auto">
+              <table>
+                <thead><tr><th>指标 (USD)</th><th class="r">TE Project P&L</th><th class="r">CER P&L</th></tr></thead>
+                <tbody>
+                  <tr><td>Total Sales</td><td class="r">17,149,532</td><td class="r">17,149,532</td></tr>
+                  <tr><td>Incremental Sales</td><td class="r">9,196,126</td><td class="r">9,196,126</td></tr>
+                  <tr class="section-row"><td colspan="3">Std Margin %</td></tr>
+                  <tr><td>— Overall</td><td class="r">41.03%</td><td class="r">41.03%</td></tr>
+                  <tr><td>— Incremental</td><td class="r" style="color:var(--red)">-9.31%</td><td class="r" style="color:var(--red)">-9.31%</td></tr>
+                  <tr class="section-row"><td colspan="3">OI %</td></tr>
+                  <tr><td>— Overall</td><td class="r">36.16%</td><td class="r">36.83%</td></tr>
+                  <tr><td>— Incremental</td><td class="r" style="color:var(--red)">-14.76%</td><td class="r" style="color:var(--red)">-13.52%</td></tr>
+                  <tr class="section-row"><td colspan="3">ROIC</td></tr>
+                  <tr><td>— Overall</td><td class="r">85.0%</td><td class="r">92.4%</td></tr>
+                  <tr><td>— Incremental</td><td class="r" style="color:var(--red)">-39.4%</td><td class="r" style="color:var(--red)">-40.8%</td></tr>
+                  <tr class="section-row"><td colspan="3">Payback (Years)</td></tr>
+                  <tr><td>— Overall</td><td class="r">2.13</td><td class="r">0.56</td></tr>
+                  <tr class="grandtotal"><td>Payback (考虑实际 PO 日)</td><td class="r">1.30</td><td class="r">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:12px 16px"><div class="ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>增量指标为负：本地化替代现有外购方案，增量销售毛利偏低，但整体 (Overall) 经济性强劲。</div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>销量敏感性分析 (CER P&amp;L)</h3><span class="xls">Data for PAC!B55</span></div>
+            <div class="card-b" id="sensChart"></div>
+            <div class="card-b np" style="border-top:1px solid var(--line-2);overflow-x:auto">
+              <table>
+                <thead><tr><th>Volume 情景</th><th class="r">Total Sales</th><th class="r">Std Margin%</th><th class="r">OI%</th><th class="r">Payback</th></tr></thead>
+                <tbody>
+                  <tr class="hl"><td>100% (基准)</td><td class="r">17,149,532</td><td class="r">41.0%</td><td class="r">36.8%</td><td class="r">0.56 yr</td></tr>
+                  <tr><td>75%</td><td class="r">12,862,149</td><td class="r">40.6%</td><td class="r">36.4%</td><td class="r">0.75 yr</td></tr>
+                  <tr><td>50% (Yr1-3) / 100% (Yr4+)</td><td class="r">11,526,226</td><td class="r">40.6%</td><td class="r">—</td><td class="r">1.05 yr</td></tr>
+                  <tr><td>50%</td><td class="r">8,574,766</td><td class="r">39.6%</td><td class="r">35.4%</td><td class="r">1.05 yr</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:12px 16px"><div class="ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>即便销量腰斩，回收期仍仅 1.05 年——轻资产本地化项目对销量波动极不敏感，财务稳健。</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ASSUMPTIONS ===== -->
+      <section class="panel" id="assum">
+        <div class="card">
+          <div class="card-h"><h3><span class="ch-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82M4.6 9a1.65 1.65 0 00-.33-1.82"/></svg></span>财务假设参数 (>FY25 Budget)</h3><span class="xls">Financial Index</span></div>
+          <div class="card-b np">
+            <div class="specs" style="grid-template-columns:repeat(5,1fr)">
+              <div class="spec"><div class="sl">SG&A %</div><div class="sv">2.27%</div></div>
+              <div class="spec"><div class="sl">P&L Engineering Exp %</div><div class="sv">2.85%</div></div>
+              <div class="spec"><div class="sl">A/R Days</div><div class="sv">97</div></div>
+              <div class="spec"><div class="sl">Inventory Days</div><div class="sv">55</div></div>
+              <div class="spec"><div class="sl">A/P Days</div><div class="sv">70</div></div>
+              <div class="spec"><div class="sl">Inbound Freight (SZ→WGQ)</div><div class="sv">1.6%</div></div>
+              <div class="spec"><div class="sl">Outbound Shipping</div><div class="sv">1.0%</div></div>
+              <div class="spec"><div class="sl">Engineering Hourly Rate</div><div class="sv">59.4</div></div>
+              <div class="spec"><div class="sl">Material & Purchasing %</div><div class="sv">80.3%</div></div>
+              <div class="spec"><div class="sl">WACC</div><div class="sv">10.5%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-a">
+          <div class="card">
+            <div class="card-h"><h3>直接人工费率 (生命周期加权)</h3><span class="xls">Financial Index!B13</span></div>
+            <div class="card-b np" style="overflow-x:auto">
+              <table>
+                <thead><tr><th>Period</th><th class="r">Weight (Vol)</th><th class="r">Labor Rate</th><th class="r">Weighted Labor Cost</th></tr></thead>
+                <tbody>
+                  <tr><td>P1</td><td class="r">600,000</td><td class="r">51.36</td><td class="r">30,817,050</td></tr>
+                  <tr><td>P2</td><td class="r">1,000,000</td><td class="r">53.67</td><td class="r">53,673,029</td></tr>
+                  <tr><td>P3</td><td class="r">1,000,000</td><td class="r">56.09</td><td class="r">56,088,315</td></tr>
+                  <tr><td>P4</td><td class="r">1,000,000</td><td class="r">58.61</td><td class="r">58,612,289</td></tr>
+                  <tr><td>P5</td><td class="r">1,000,000</td><td class="r">61.25</td><td class="r">61,249,842</td></tr>
+                  <tr class="grandtotal"><td>TTL / 加权均值</td><td class="r">4,600,000</td><td class="r">56.62</td><td class="r">260,440,525</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:12px 16px"><div class="ann"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>人工费率按 <b>4.5% 年通胀</b> 逐年递增 (2024 基准 45.72)，并以各期销量加权。</div></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>汇率表 (FX → USD)</h3><span class="xls">Financial Index!B8</span></div>
+            <div class="card-b np" style="overflow-x:auto">
+              <table>
+                <thead><tr><th>币种</th><th class="r">= USD</th><th class="r">= CNY</th></tr></thead>
+                <tbody>
+                  <tr class="hl"><td>CNY 人民币</td><td class="r">0.13808</td><td class="r">1.00000</td></tr>
+                  <tr><td>USD 美元</td><td class="r">1.00000</td><td class="r">7.24218</td></tr>
+                  <tr><td>EUR 欧元</td><td class="r">1.08540</td><td class="r">7.86066</td></tr>
+                  <tr><td>JPY 日元</td><td class="r">0.00636</td><td class="r">0.04606</td></tr>
+                  <tr><td>KRW 韩元</td><td class="r">0.00072</td><td class="r">0.00521</td></tr>
+                  <tr><td>CZK 捷克克朗</td><td class="r">0.04395</td><td class="r">0.31829</td></tr>
+                  <tr><td>HKD 港币</td><td class="r">0.12783</td><td class="r">0.92577</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:12px 16px"><div class="tag-row"><span class="chip">维持工程费率引用</span><span class="chip">OH Rate breakdown</span><span class="chip">Benchwork H_Rate</span><span class="chip">Operation & Costing H_Rate</span><span class="chip">Freight & Burden</span></div><div class="ann" style="margin-top:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>原 workbook 另有多张费率/工时基础表（隐藏页），供成本卷积引用。</div></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- workbook tab strip (Excel fidelity) -->
+    <div class="wb-tabs" id="wbTabs">
+      <div class="wb-tab on" data-go="summary">CHECK LIST</div>
+      <div class="wb-tab" data-go="info">INFO</div>
+      <div class="wb-tab" data-go="sales">SALES proposed</div>
+      <div class="wb-tab" data-go="capex">CAPEX</div>
+      <div class="wb-tab" data-go="cost">2483376-1</div>
+      <div class="wb-tab" data-go="pnl">CER P&amp;L</div>
+      <div class="wb-tab" data-go="pnl">TE project P&amp;L</div>
+      <div class="wb-tab" data-go="metrics">Data for PAC</div>
+      <div class="wb-tab" data-go="metrics">ROIC</div>
+      <div class="wb-tab" data-go="assum">Financial Index</div>
+      <div class="wb-tab hidden-sheet" data-go="capex">Capital Depreciation</div>
+      <div class="wb-tab hidden-sheet" data-go="assum">OH Rate breakdown</div>
+      <div class="wb-tab hidden-sheet" data-go="assum">Freight & Burden</div>
+      <div class="wb-tab hidden-sheet" data-go="info">Master Data</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const tabsEl=document.getElementById('tabs');
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===name));
+  document.querySelectorAll('.wb-tab').forEach(x=>x.classList.toggle('on',x.dataset.go===name));
+  document.getElementById('content').scrollTop=0;
+  if(name==='sales')salesChart();
+  if(name==='metrics')sensChart();
+}
+tabsEl.addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)showTab(t.dataset.tab);});
+document.getElementById('wbTabs').addEventListener('click',e=>{const t=e.target.closest('.wb-tab');if(t)showTab(t.dataset.go);});
+
+function tg(grp,el){el.classList.toggle('open');const o=el.classList.contains('open');document.querySelectorAll('.row-'+grp).forEach(r=>r.style.display=o?'':'none');}
+
+/* ===== SVG charts ===== */
+const NS='http://www.w3.org/2000/svg';
+function el(n,a){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;}
+
+function donut(){
+  const host=document.getElementById('costDonut');if(!host||host.dataset.d)return;host.dataset.d=1;
+  const data=[80.3,8.9,6.1,2.4,1.9,0.5],colors=['#2563eb','#0f9d58','#7c3aed','#ff6a00','#d98a00','#94a3b8'];
+  const S=150,cx=75,cy=75,r=58,sw=24,svg=el('svg',{viewBox:`0 0 ${S} ${S}`,width:S,height:S});
+  let acc=0,C=2*Math.PI*r;
+  data.forEach((d,i)=>{const len=C*d/100;const c=el('circle',{cx,cy,r,fill:'none',stroke:colors[i],'stroke-width':sw,'stroke-dasharray':`${len} ${C-len}`,'stroke-dashoffset':-C*acc/100,transform:`rotate(-90 ${cx} ${cy})`});c.appendChild(el('animate',{attributeName:'stroke-dasharray',from:`0 ${C}`,to:`${len} ${C-len}`,dur:'0.9s',fill:'freeze',begin:(i*0.07)+'s'}));svg.appendChild(c);acc+=d;});
+  svg.appendChild(el('text',{x:cx,y:cy-3,'text-anchor':'middle','font-size':18,'font-weight':800,fill:'#0f172a'})).textContent='$2.20';
+  svg.appendChild(el('text',{x:cx,y:cy+13,'text-anchor':'middle','font-size':9,fill:'#94a3b8'})).textContent='/ pc';
+  host.appendChild(svg);
+}
+
+function cashChart(){
+  const host=document.getElementById('cashChart');if(!host||host.dataset.d)return;host.dataset.d=1;
+  const W=host.clientWidth||520,H=200,pad={l:46,r:16,t:14,b:26};
+  const labels=['P0','P1','P2','P3','P4','P5'];
+  const cum=[-0.238,0.211,1.652,3.076,4.501,5.742];
+  const min=-1,max=6,iw=W-pad.l-pad.r,ih=H-pad.t-pad.b;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',height:H});
+  const Y=v=>pad.t+ih-ih*(v-min)/(max-min);
+  for(let i=0;i<=4;i++){const val=min+(max-min)*i/4,y=Y(val);svg.appendChild(el('line',{x1:pad.l,y1:y,x2:W-pad.r,y2:y,stroke:'#eef2f7'}));svg.appendChild(el('text',{x:pad.l-6,y:y+3,'text-anchor':'end','font-size':9,fill:'#94a3b8'})).textContent='$'+val.toFixed(0)+'M';}
+  const zy=Y(0);svg.appendChild(el('line',{x1:pad.l,y1:zy,x2:W-pad.r,y2:zy,stroke:'#cbd5e1','stroke-dasharray':'3 3'}));
+  const X=i=>pad.l+iw*i/(labels.length-1);
+  const pts=cum.map((v,i)=>[X(i),Y(v)]);
+  const grad=el('linearGradient',{id:'cg',x1:0,y1:0,x2:0,y2:1});grad.appendChild(el('stop',{offset:'0%','stop-color':'#0f9d58','stop-opacity':.28}));grad.appendChild(el('stop',{offset:'100%','stop-color':'#0f9d58','stop-opacity':0}));svg.appendChild(grad);
+  svg.appendChild(el('path',{d:`M${pts[0][0]} ${zy} `+pts.map(p=>'L'+p[0]+' '+p[1]).join(' ')+` L${pts[pts.length-1][0]} ${zy} Z`,fill:'url(#cg)'}));
+  const line=el('path',{d:pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' '),fill:'none',stroke:'#0f9d58','stroke-width':2.5,'stroke-linejoin':'round'});line.setAttribute('stroke-dasharray','700');line.setAttribute('stroke-dashoffset','700');line.appendChild(el('animate',{attributeName:'stroke-dashoffset',from:700,to:0,dur:'1.2s',fill:'freeze'}));svg.appendChild(line);
+  pts.forEach(p=>svg.appendChild(el('circle',{cx:p[0],cy:p[1],r:3,fill:'#fff',stroke:'#0f9d58','stroke-width':2})));
+  const px=X(0)+(X(1)-X(0))*(0.238/(0.238+0.211));
+  svg.appendChild(el('circle',{cx:px,cy:zy,r:4,fill:'#ff6a00'}));
+  const t=el('text',{x:px+6,y:zy-7,'font-size':10,'font-weight':700,fill:'#ff6a00'});t.textContent='回收 0.56yr';svg.appendChild(t);
+  labels.forEach((l,i)=>svg.appendChild(el('text',{x:X(i),y:H-8,'text-anchor':'middle','font-size':9,fill:'#94a3b8'})).textContent=l);
+  host.appendChild(svg);
+}
+
+function salesChart(){
+  const host=document.getElementById('salesChart');if(!host||host.dataset.d)return;host.dataset.d=1;
+  const W=host.clientWidth||560,H=220,pad={l:42,r:42,t:16,b:28};
+  const labels=['P1','P2','P3','P4','P5'];
+  const vol=[1.017,1.0,1.0,1.0,0.583],sales=[3.79,3.73,3.73,3.73,2.17];
+  const iw=W-pad.l-pad.r,ih=H-pad.t-pad.b,bw=iw/labels.length,maxV=1.2;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',height:H});
+  for(let i=0;i<=4;i++){const y=pad.t+ih*i/4;svg.appendChild(el('line',{x1:pad.l,y1:y,x2:W-pad.r,y2:y,stroke:'#eef2f7'}));}
+  vol.forEach((v,i)=>{const bh=ih*v/maxV,x=pad.l+bw*i+bw*0.25,y=pad.t+ih-bh;const g=el('linearGradient',{id:'sb'+i,x1:0,y1:0,x2:0,y2:1});g.appendChild(el('stop',{offset:'0%','stop-color':'#3b82f6'}));g.appendChild(el('stop',{offset:'100%','stop-color':'#93c0ff'}));svg.appendChild(g);const r=el('rect',{x,y:pad.t+ih,width:bw*0.5,height:0,rx:3,fill:'url(#sb'+i+')'});r.appendChild(el('animate',{attributeName:'height',from:0,to:bh,dur:'0.7s',fill:'freeze',begin:(i*0.05)+'s'}));r.appendChild(el('animate',{attributeName:'y',from:pad.t+ih,to:y,dur:'0.7s',fill:'freeze',begin:(i*0.05)+'s'}));svg.appendChild(r);svg.appendChild(el('text',{x:pad.l+bw*i+bw/2,y:H-8,'text-anchor':'middle','font-size':9.5,fill:'#94a3b8'})).textContent=labels[i];});
+  const sMax=4.2,pts=sales.map((s,i)=>[pad.l+bw*i+bw/2,pad.t+ih-ih*s/sMax]);
+  const line=el('path',{d:pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' '),fill:'none',stroke:'#ff6a00','stroke-width':2.5,'stroke-linejoin':'round'});line.setAttribute('stroke-dasharray','500');line.setAttribute('stroke-dashoffset','500');line.appendChild(el('animate',{attributeName:'stroke-dashoffset',from:500,to:0,dur:'1.1s',fill:'freeze'}));svg.appendChild(line);
+  pts.forEach((p,i)=>{svg.appendChild(el('circle',{cx:p[0],cy:p[1],r:3.2,fill:'#fff',stroke:'#ff6a00','stroke-width':2}));svg.appendChild(el('text',{x:p[0],y:p[1]-8,'text-anchor':'middle','font-size':9,'font-weight':700,fill:'#ff6a00'})).textContent='$'+sales[i].toFixed(1)+'M';});
+  host.appendChild(svg);
+}
+
+function sensChart(){
+  const host=document.getElementById('sensChart');if(!host||host.dataset.d)return;host.dataset.d=1;
+  const W=host.clientWidth||520,H=190,pad={l:46,r:16,t:16,b:34};
+  const labels=['100%','75%','50/100','50%'],sales=[17.15,12.86,11.53,8.57],pay=[0.56,0.75,1.05,1.05];
+  const iw=W-pad.l-pad.r,ih=H-pad.t-pad.b,bw=iw/labels.length,maxV=18;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',height:H});
+  for(let i=0;i<=3;i++){const y=pad.t+ih*i/3;svg.appendChild(el('line',{x1:pad.l,y1:y,x2:W-pad.r,y2:y,stroke:'#eef2f7'}));svg.appendChild(el('text',{x:pad.l-6,y:y+3,'text-anchor':'end','font-size':9,fill:'#94a3b8'})).textContent='$'+(maxV*(1-i/3)).toFixed(0)+'M';}
+  sales.forEach((v,i)=>{const bh=ih*v/maxV,x=pad.l+bw*i+bw*0.22,y=pad.t+ih-bh;const r=el('rect',{x,y:pad.t+ih,width:bw*0.56,height:0,rx:3,fill:i===0?'#ff6a00':'#cdd9ef'});r.appendChild(el('animate',{attributeName:'height',from:0,to:bh,dur:'0.7s',fill:'freeze',begin:(i*0.06)+'s'}));r.appendChild(el('animate',{attributeName:'y',from:pad.t+ih,to:y,dur:'0.7s',fill:'freeze',begin:(i*0.06)+'s'}));svg.appendChild(r);svg.appendChild(el('text',{x:pad.l+bw*i+bw/2,y:y-6,'text-anchor':'middle','font-size':9,'font-weight':700,fill:'#64748b'})).textContent=pay[i]+'yr';svg.appendChild(el('text',{x:pad.l+bw*i+bw/2,y:H-16,'text-anchor':'middle','font-size':9.5,fill:'#94a3b8'})).textContent=labels[i];svg.appendChild(el('text',{x:pad.l+bw*i+bw/2,y:H-4,'text-anchor':'middle','font-size':8,fill:'#cbd5e1'})).textContent='Volume';});
+  host.appendChild(svg);
+}
+
+window.addEventListener('load',()=>{donut();cashChart();});
+</script>
+</body>
+</html>
