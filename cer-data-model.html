@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>数据模型 · CER 平台 Schema Explorer</title>
+<style>
+  :root{
+    --navy:#0e1726;--ink:#0f172a;--slate:#475569;--slate-2:#64748b;--muted:#94a3b8;
+    --line:#e6eaf0;--line-2:#eef2f7;--bg:#f4f6fa;--card:#fff;
+    --te:#ff6a00;--te-soft:#fff1e6;--blue:#2563eb;--blue-soft:#eaf1ff;
+    --green:#0f9d58;--green-soft:#e7f6ee;--amber:#d98a00;--amber-soft:#fff5e1;
+    --red:#e1442f;--violet:#7c3aed;--violet-soft:#f3ecff;--teal:#0d9488;--teal-soft:#e2f6f3;
+    --radius:13px;--shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.18);
+    --font:'Segoe UI',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+    --mono:'SF Mono','Cascadia Code',ui-monospace,'Roboto Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  *::-webkit-scrollbar{width:9px;height:9px}*::-webkit-scrollbar-thumb{background:#c7d0dd;border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+
+  .app{display:grid;grid-template-columns:248px 1fr;height:100vh;overflow:hidden}
+  .sidebar{background:linear-gradient(180deg,var(--navy),#0b1320);color:#cbd5e1;display:flex;flex-direction:column}
+  .brand{display:flex;align-items:center;gap:11px;padding:18px 18px 16px}
+  .brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--te),#ff9248);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px}
+  .brand .name{font-size:15px;font-weight:700;color:#fff}.brand .sub{font-size:10.5px;color:#7e8aa0;letter-spacing:.6px;text-transform:uppercase}
+  .nav{padding:6px 12px;flex:1;overflow-y:auto}
+  .nav-group{margin-top:14px}.nav-group .gl{font-size:10px;font-weight:700;letter-spacing:1px;color:#5d6b85;text-transform:uppercase;padding:6px 12px}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:#aab6cb;cursor:pointer;font-size:12.5px;font-weight:500;position:relative}
+  .nav-item .ico{width:17px;height:17px;opacity:.85}.nav-item:hover{background:#16233a;color:#e6ecf5}
+  .nav-item.active{background:linear-gradient(90deg,rgba(255,106,0,.16),rgba(255,106,0,.02));color:#fff}
+  .nav-item.active::before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:3px;background:var(--te)}
+  .side-foot{padding:12px;border-top:1px solid #1b2740}
+  .userbox{display:flex;align-items:center;gap:10px;padding:7px 9px}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px}
+  .userbox .un{font-size:12.5px;color:#e6ecf5;font-weight:600}.userbox .ur{font-size:10.5px;color:#7e8aa0}
+
+  .main{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .topbar{height:56px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 22px;flex:none}
+  .crumbs{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--slate-2)}.crumbs b{color:var(--ink);font-weight:600}.crumbs .sep{color:#cbd5e1}
+  .switcher{margin-left:auto;display:flex;background:#f1f4f9;border-radius:9px;padding:3px}
+  .switcher a{text-decoration:none;font-size:11.5px;font-weight:600;color:var(--slate-2);padding:6px 12px;border-radius:7px}
+  .switcher a.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+
+  .head{background:var(--card);border-bottom:1px solid var(--line);padding:14px 22px;flex:none;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .head h1{font-size:17px;font-weight:700}.head .h-id{font-family:var(--mono);font-size:11px;color:var(--te);font-weight:700}
+  .chip{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px;background:#f1f4f9;color:var(--slate)}
+  .head .stat{margin-left:auto;display:flex;gap:8px}
+  .seg{display:inline-flex;background:#f1f4f9;border-radius:9px;padding:3px}
+  .seg button{border:none;background:transparent;font-size:12px;font-weight:700;color:var(--slate-2);padding:6px 14px;border-radius:7px;cursor:pointer}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+
+  .body{flex:1;display:grid;grid-template-columns:1fr 340px;min-height:0}
+  .canvas{overflow:auto;padding:20px 22px 50px}
+  .view{display:none}.view.active{display:block}
+
+  /* layer swimlane */
+  .layer{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .layer-h{display:flex;align-items:center;gap:11px;padding:10px 16px;border-bottom:1px solid var(--line-2)}
+  .layer-h .lc{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:12px;color:#fff}
+  .layer-h h3{font-size:13.5px;font-weight:700}
+  .layer-h .ld{font-size:11px;color:var(--muted)}
+  .layer-h .cnt{margin-left:auto;font-size:11px;color:var(--muted);font-family:var(--mono)}
+  .ents{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px}
+  .ent{border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;background:#fff;transition:.12s;min-width:150px;position:relative}
+  .ent:hover{border-color:#c9d6ea;box-shadow:var(--shadow);transform:translateY(-1px)}
+  .ent.sel{border-color:var(--te);box-shadow:0 0 0 3px var(--te-soft)}
+  .ent.dim{opacity:.32}
+  .ent.rel{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-soft)}
+  .ent .en{font-family:var(--mono);font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px}
+  .ent .ed{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .ent .vt{position:absolute;top:8px;right:9px;font-size:8.5px;font-weight:800;padding:1px 5px;border-radius:5px;letter-spacing:.3px}
+  .vt.ver{background:var(--te-soft);color:var(--te)}
+  .vt.snap{background:var(--blue-soft);color:var(--blue)}
+  .dot{width:8px;height:8px;border-radius:3px;flex:none}
+
+  /* version state machine */
+  .vsm{display:flex;align-items:center;gap:0;flex-wrap:wrap;padding:20px}
+  .vstate{border:2px solid var(--line);border-radius:11px;padding:11px 16px;font-weight:700;font-size:12.5px;background:#fff;text-align:center;min-width:120px}
+  .vstate small{display:block;font-size:10px;color:var(--muted);font-weight:500;margin-top:2px}
+  .vstate.draft{border-color:var(--slate-2)}.vstate.review{border-color:var(--amber);background:var(--amber-soft)}
+  .vstate.appr{border-color:var(--green);background:var(--green-soft)}.vstate.rej{border-color:var(--red)}
+  .vstate.sup{border-color:var(--muted);background:#f6f8fc;color:var(--muted)}
+  .varrow{display:flex;flex-direction:column;align-items:center;padding:0 8px;color:var(--slate-2)}
+  .varrow .vl{font-size:10px;font-weight:700;margin-bottom:2px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+  .card-h{padding:12px 16px;border-bottom:1px solid var(--line-2);font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:9px}
+  .card-h .ci{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--te-soft);color:var(--te)}
+  .card-b{padding:16px}
+  .note{display:flex;gap:10px;background:var(--blue-soft);border:1px solid #d4e2ff;border-radius:11px;padding:11px 13px;font-size:12px;color:#1e40af;margin-bottom:14px}
+  .note .ni{flex:none}
+
+  /* DAG */
+  .dag{padding:18px;overflow-x:auto}
+  .dag-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .dnode{border:1px solid var(--line);border-radius:10px;padding:9px 13px;background:#fff;font-size:12px;font-weight:600;min-width:130px}
+  .dnode .dl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .dnode.in{border-left:3px solid var(--blue)}.dnode.calc{border-left:3px solid var(--te)}.dnode.out{border-left:3px solid var(--green)}
+  .darr{color:var(--muted);font-weight:700}
+
+  /* detail panel */
+  .detail{border-left:1px solid var(--line);background:var(--card);overflow-y:auto;padding:0}
+  .dt-empty{padding:40px 22px;text-align:center;color:var(--muted)}
+  .dt-empty svg{opacity:.4;margin-bottom:10px}
+  .dt-h{padding:16px 18px;border-bottom:1px solid var(--line-2);position:sticky;top:0;background:#fff;z-index:2}
+  .dt-h .tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.4px}
+  .dt-h .nm{font-family:var(--mono);font-size:16px;font-weight:800;margin-top:8px}
+  .dt-h .ds{font-size:12px;color:var(--slate-2);margin-top:3px}
+  .dt-src{margin-top:9px;display:flex;align-items:center;gap:7px;font-size:11px;color:var(--slate)}
+  .dt-src .xls{font-family:var(--mono);font-size:10px;color:#fff;background:#217346;padding:2px 7px;border-radius:5px;font-weight:700}
+  .dt-sec{padding:12px 18px;border-bottom:1px solid var(--line-2)}
+  .dt-sec .st{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+  .field{display:flex;align-items:baseline;gap:8px;padding:5px 0;font-size:12px;border-bottom:1px dashed var(--line-2)}
+  .field:last-child{border-bottom:none}
+  .field .fk{font-family:var(--mono);font-weight:700;color:var(--ink);min-width:130px}
+  .field .ft{font-family:var(--mono);font-size:10.5px;color:var(--blue);background:var(--blue-soft);padding:0 6px;border-radius:5px}
+  .field .fd{color:var(--slate-2);flex:1}
+  .field .pk{font-size:9px;font-weight:800;color:var(--te);background:var(--te-soft);padding:1px 5px;border-radius:4px}
+  .field .fkk{font-size:9px;font-weight:800;color:var(--violet);background:var(--violet-soft);padding:1px 5px;border-radius:4px}
+  .field .calc{font-size:9px;font-weight:800;color:var(--green);background:var(--green-soft);padding:1px 5px;border-radius:4px}
+  .rel-list{display:flex;flex-direction:column;gap:6px}
+  .rel-item{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+  .rel-item:hover{background:#f6f8fc;border-color:#c9d6ea}
+  .rel-item .rk{font-family:var(--mono);font-size:9px;color:var(--muted);background:#f1f4f9;padding:1px 6px;border-radius:5px}
+  .rel-item .rn{font-family:var(--mono);font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">TE</div><div><div class="name">CER Cockpit</div><div class="sub">Capital Expenditure</div></div></div>
+    <nav class="nav">
+      <div class="nav-group"><div class="gl">工作区</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>仪表盘</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 16h6"/><rect x="4" y="3" width="16" height="18" rx="2"/></svg>CER 申请</div>
+      </div>
+      <div class="nav-group"><div class="gl">架构</div>
+        <div class="nav-item active"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>数据模型</div>
+      </div>
+    </nav>
+    <div class="side-foot"><div class="userbox"><div class="avatar">TT</div><div style="flex:1"><div class="un">Tim Tang</div><div class="ur">Cost Engineering · APAC</div></div></div></div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumbs"><span>架构</span><span class="sep">/</span><b>数据模型 Schema Explorer</b></div>
+      <div class="switcher">
+        <a href="cer-cockpit-poc.html">① Cockpit</a>
+        <a href="cer-template-replica.html">② 模板复刻</a>
+        <a href="cer-entry-workbench.html">③ 录入工作台</a>
+        <a class="on" href="cer-data-model.html">④ 数据模型</a>
+      </div>
+    </div>
+
+    <div class="head">
+      <div>
+        <div class="h-id">docs/data-model.md · docs/schema.sql</div>
+        <h1>CER 平台数据模型 <span class="chip">33 sheets → 4 层 · 28 实体</span></h1>
+      </div>
+      <div class="stat">
+        <div class="seg" id="viewseg">
+          <button class="on" data-v="schema">实体分层</button>
+          <button data-v="version">版本控制</button>
+          <button data-v="dag">计算 DAG</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="canvas">
+
+        <!-- VIEW: SCHEMA -->
+        <div class="view active" id="view-schema">
+          <div class="note"><svg class="ni" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+            <div>点击任一实体查看字段、来源 sheet 与关联关系。<b style="color:#ff6a00">橙标 = 版本化</b>（拥有 <code>cer_version_id</code>，copy-on-write）；<b style="color:#2563eb">蓝标 = 版本快照 1:1</b>。</div>
+          </div>
+          <div id="layers"></div>
+        </div>
+
+        <!-- VIEW: VERSION -->
+        <div class="view" id="view-version">
+          <div class="card">
+            <div class="card-h"><span class="ci"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 9v6a3 3 0 003 3h6"/></svg></span>版本生命周期状态机</div>
+            <div class="vsm">
+              <div class="vstate draft">DRAFT<small>可编辑</small></div>
+              <div class="varrow"><span class="vl">提交</span><svg width="22" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+              <div class="vstate review">IN_REVIEW<small>锁定·可批注</small></div>
+              <div class="varrow"><span class="vl">批准</span><svg width="22" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+              <div class="vstate appr">APPROVED<small>永久只读</small></div>
+              <div class="varrow"><span class="vl">新版获批</span><svg width="22" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+              <div class="vstate sup">SUPERSEDED<small>历史归档</small></div>
+            </div>
+            <div style="padding:0 20px 16px;display:flex;gap:10px;flex-wrap:wrap">
+              <span class="chip">IN_REVIEW → DRAFT：退回</span><span class="chip">IN_REVIEW → REJECTED：拒绝</span><span class="chip">任意只读态 → 克隆 → 新 DRAFT</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><span class="ci"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></span>Copy-on-Write 快照机制</div>
+            <div class="card-b">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div>
+                  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">新建版本 = 克隆上一版全部输入行</div>
+                  <pre style="background:#0e1726;color:#cbd5e1;border-radius:10px;padding:13px;font-family:var(--mono);font-size:11px;line-height:1.7;overflow-x:auto">POST /cer/{id}/versions
+<span style="color:#7e8aa0">-- 事务内克隆, 自然键不变</span>
+clone(cer_info)        1:1
+clone(cer_fg)          + id 映射
+clone(cer_sales_*)     重指向 fg
+clone(cer_capex_item)
+clone(cer_bom)         重映射 parent
+<span style="color:#34d399">→ 新 DRAFT 版本就绪</span></pre>
+                </div>
+                <div>
+                  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">为什么选 COW 而非 delta</div>
+                  <div class="field"><span class="calc">✓</span><span class="fd">点时间完整重建，无需回放</span></div>
+                  <div class="field"><span class="calc">✓</span><span class="fd">批准版天然不可变（触发器冻结）</span></div>
+                  <div class="field"><span class="calc">✓</span><span class="fd">自然键匹配 → 秒级 diff（v4.1→v4.2）</span></div>
+                  <div class="field"><span class="calc">✓</span><span class="fd">贴合 Excel "另存为新版" 心智</span></div>
+                  <div class="field"><span class="pk">FX</span><span class="fd">版本固化 fx_value + assumption_set，历史可复现</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: DAG -->
+        <div class="view" id="view-dag">
+          <div class="note"><svg class="ni" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+            <div>把你最初需求里 <b>投资 → 折旧 → 分摊 → 结合成本卷积出物料成本</b> 那条主线，显式建模为可执行计算 DAG。</div>
+          </div>
+          <div class="card">
+            <div class="card-h"><span class="ci"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 16l3-3 3 2 4-5"/></svg></span>计算依赖图 (Roll-up DAG)</div>
+            <div class="dag">
+              <div class="dag-row"><div class="dnode in"><div class="dl">输入 L2</div>sales_forecast<br><span style="font-size:10px;color:#94a3b8">volume · price</span></div><span class="darr">＋</span><div class="dnode in"><div class="dl">输入 L2</div>capex_item<br><span style="font-size:10px;color:#94a3b8">amount · ownership</span></div><span class="darr">＋</span><div class="dnode in"><div class="dl">输入 L2</div>cer_bom<br><span style="font-size:10px;color:#94a3b8">qty · price · markup</span></div></div>
+              <div class="dag-row" style="padding-left:30px"><span class="darr">↓ 直线折旧(客户买断排除)</span><div class="dnode calc"><div class="dl">① L3</div>depreciation_schedule</div><span class="darr">÷ 年产量 →</span><div class="dnode calc">unit_depreciation $/pc</div></div>
+              <div class="dag-row" style="padding-left:30px"><span class="darr">↓ Σ line_cost</span><div class="dnode calc"><div class="dl">② roll-up</div>FG material_cost $/pc</div><span class="darr">＋ labor+OH+freight ＋折旧分摊 →</span></div>
+              <div class="dag-row" style="padding-left:30px"><div class="dnode calc"><div class="dl">③ L3</div>cost_rollup.unit_cost</div><span class="darr">按 volume 加权 →</span><div class="dnode calc">project unit_cost</div></div>
+              <div class="dag-row" style="padding-left:30px"><span class="darr">↓ Sales−Cost−OPEX</span><div class="dnode calc"><div class="dl">④ L3</div>cer_pnl (OI / Cash Flow)</div><span class="darr">折现 @WACC →</span></div>
+              <div class="dag-row" style="padding-left:30px"><div class="dnode out"><div class="dl">⑤ 输出</div>financial_metric<br><span style="font-size:10px;color:#94a3b8">NPV·IRR·ROIC·Payback</span></div><span class="darr">＋</span><div class="dnode out">sensitivity</div><span class="darr">＋</span><div class="dnode out">checklist</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><span class="ci" style="background:var(--green-soft);color:var(--green)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>勾稽校验点（DB 约束 / 服务层断言）</div>
+            <div class="card-b">
+              <div class="field"><span class="fk">折旧勾稽</span><span class="fd">Σ depreciation == Σ capex(非客户买断) → 样本 $237,743 <span class="chip">Depreciation Value Check</span></span></div>
+              <div class="field"><span class="fk">寿命一致</span><span class="fd">cer_info.depreciation_life == gate_definition <span class="chip">Depreciation Life Check</span></span></div>
+              <div class="field"><span class="fk">销量一致</span><span class="fd">Σ sales(proposed).volume == Σ cost_rollup.volume <span class="chip">Sales Volume Check</span></span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DETAIL PANEL -->
+      <div class="detail" id="detail">
+        <div class="dt-empty" id="dtEmpty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          <div>点击左侧实体查看<br>字段 · 来源 sheet · 关联</div>
+        </div>
+        <div id="dtContent" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// 实体元数据 (节选关键字段) ——————————————————————————————
+const LAYERS=[
+  {id:'L0',name:'Master / Reference',desc:'跨 CER 共享 · 按生效期/财年版本化',color:'#0d9488',
+   ents:['currency','fx_rate_set','assumption_set','labor_rate','overhead_rate','duty_rate','plant','product_line','customer','oem','part_master','material_master','gate_definition']},
+  {id:'L1',name:'Project',desc:'项目主数据',color:'#2563eb',ents:['project']},
+  {id:'L2',name:'CER Document ★版本化★',desc:'copy-on-write 快照核心',color:'#ff6a00',
+   ents:['cer','cer_version','cer_info','cer_fg','cer_sales_forecast','cer_capex_item','cer_capex_followon','cer_bom','cer_process_step','cer_conversion_cost']},
+  {id:'L3',name:'Calc Output',desc:'按版本物化的计算结果',color:'#7c3aed',
+   ents:['cer_depreciation_schedule','cer_cost_rollup','cer_pnl','cer_financial_metric','cer_sensitivity','cer_checklist_item']},
+  {id:'L4',name:'Workflow & Audit',desc:'流程与审计',color:'#64748b',ents:['approval_step','audit_log','attachment']},
+];
+const F=(k,t,d,flag)=>({k,t,d,flag});
+const E={
+  currency:{tag:'L0',c:'#0d9488',d:'币种',src:'Financial Index!B8',fields:[F('code','char(3)','CNY/USD/EUR','PK')]},
+  fx_rate_set:{tag:'L0',c:'#0d9488',d:'汇率集 (按预算/生效期)',src:'Financial Index!B8',fields:[F('id','bigserial','','PK'),F('label','text','>FY25 Budget'),F('effective_date','date',''),F('base_ccy','char(3)','报告币 USD','FK')],rel:[['1:N','fx_rate'],['pin','cer_version']]},
+  assumption_set:{tag:'L0',c:'#0d9488',d:'财务假设集',src:'Financial Index!B4',fields:[F('id','bigserial','','PK'),F('sga_pct','num','2.27%'),F('eng_expense_pct','num','2.85%'),F('ar_days','int','97'),F('inv_days','int','55'),F('ap_days','int','70'),F('inbound_freight_pct','num','1.6%'),F('outbound_ship_pct','num','1.0%'),F('eng_hourly_rate','num','59.4'),F('material_purch_pct','num','80.3%'),F('wacc','num','10.5%')],rel:[['1:N','labor_rate'],['pin','cer_version']]},
+  labor_rate:{tag:'L0',c:'#0d9488',d:'直接人工费率(按财年通胀)',src:'Financial Index!B13',fields:[F('fiscal_year','int','','PK'),F('rate','num','51.36→61.25'),F('inflation_pct','num','4.5%')]},
+  overhead_rate:{tag:'L0',c:'#0d9488',d:'制造费率',src:'OH Rate breakdown / Overhead',fields:[F('cost_center','text',''),F('process','text',''),F('hourly_rate','num',''),F('basis','text','')]},
+  duty_rate:{tag:'L0',c:'#0d9488',d:'关税率',src:'duty',fields:[F('hs_code','text',''),F('region','text',''),F('rate','num','')]},
+  plant:{tag:'L0',c:'#0d9488',d:'工厂',src:'INFO!B18',fields:[F('code','text','NEPZ','PK'),F('region','text','CN')]},
+  product_line:{tag:'L0',c:'#0d9488',d:'产品线',src:'INFO!B15',fields:[F('name','text','China.Charging Inlet')]},
+  customer:{tag:'L0',c:'#0d9488',d:'客户',src:'INFO!B21',fields:[F('name','text','Geely')]},
+  oem:{tag:'L0',c:'#0d9488',d:'OEM',src:'INFO!B22',fields:[F('name','text','Geely-Geely')]},
+  part_master:{tag:'L0',c:'#0d9488',d:'物料主数据',src:'2483376-1 / CAPEX',fields:[F('part_no','text','2483376-1','PK'),F('description','text',''),F('part_type','text','FG/COMPONENT/RAW/TOOL'),F('uom','text','pcs')],rel:[['ref','cer_fg'],['ref','cer_bom'],['ref','cer_capex_item']]},
+  material_master:{tag:'L0',c:'#0d9488',d:'原材料目录',src:'2483376-1!K',fields:[F('material_no','text',''),F('category','text','Resin/Metal/Plating'),F('std_price','num','')]},
+  gate_definition:{tag:'L0',c:'#0d9488',d:'Gate 定义',src:'CHECK LIST',fields:[F('gate','enum','G1..G5','PK'),F('capex_threshold','num','投资门槛'),F('required_checks','text[]','必须OK项')]},
+
+  project:{tag:'L1',c:'#2563eb',d:'项目',src:'INFO',fields:[F('project_no','text','PRJ-24-000902644','PK'),F('name','text','Charging Inlet-Gen2 actuator'),F('project_type','text','Type 0'),F('category','text','NPI'),F('product_line_id','fk','','FK'),F('plant_id','fk','','FK'),F('customer_id','fk','','FK'),F('life_years','int','5'),F('sop_date','date','2026-03-30'),F('predecessor_no','text','Sustaining 前序')],rel:[['1:N','cer']]},
+
+  cer:{tag:'L2',c:'#ff6a00',d:'CER 头',src:'整册',fields:[F('cer_no','text','','PK'),F('project_id','fk','','FK'),F('current_version_id','fk','','FK'),F('overall_status','enum','')],rel:[['1:N','cer_version'],['N:1','project']]},
+  cer_version:{tag:'L2',c:'#ff6a00',d:'CER 版本 (快照单元)',src:'整册',ver:true,fields:[F('id','bigserial','','PK'),F('version_no','text','v4.2'),F('parent_version_id','fk','','FK'),F('gate','enum','G4'),F('status','enum','DRAFT/IN_REVIEW/APPROVED/...'),F('fx_rate_set_id','fk','pin','FK'),F('assumption_set_id','fk','pin','FK'),F('fx_value','num','7.24218 快照'),F('change_note','text',''),F('engine_version','text','可重算'),F('calc_hash','text','输入指纹')],rel:[['1:1','cer_info'],['1:N','cer_fg'],['1:N','cer_capex_item'],['pin→','fx_rate_set'],['pin→','assumption_set']]},
+  cer_info:{tag:'L2',c:'#ff6a00',d:'INFO 主输入 (1:1)',src:'INFO',snap:true,fields:[F('cer_version_id','fk','','PK'),F('initial_capex_po_month','date','2024-12-30'),F('p0_cashout_periods','int','2'),F('sop_fiscal_year','int','2026'),F('sop_months_in_p1','int','7'),F('total_depreciation_months','int','55'),F('depreciation_life_years','int','5')]},
+  cer_fg:{tag:'L2',c:'#ff6a00',d:'成品 (项目关联多成品)',src:'INFO!E8 / SALES',ver:true,fields:[F('id','bigserial','','PK'),F('cer_version_id','fk','','FK'),F('part_master_id','fk','2483376-1','FK'),F('is_primary','bool',''),F('line_no','int','')],rel:[['N:1','part_master'],['1:N','cer_sales_forecast'],['1:N','cer_bom']]},
+  cer_sales_forecast:{tag:'L2',c:'#ff6a00',d:'销量&价格预测',src:'SALES existing/proposed · INFO!D26',ver:true,fields:[F('cer_fg_id','fk','','FK'),F('scenario','enum','EXISTING/PROPOSED'),F('period_no','int','1..14'),F('fiscal_year','int',''),F('volume','num','600k/1M'),F('unit_price','num','27 CNY'),F('customer_contribution','num',''),F('rebate','num','')]},
+  cer_capex_item:{tag:'L2',c:'#ff6a00',d:'投资明细 (Mold/Die/Assy/Others)',src:'CAPEX',ver:true,fields:[F('category','enum','DIE/MOLD/PACKING/ASSY/OTHERS'),F('part_master_id','fk','','FK'),F('tool_no','text',''),F('ownership','enum','TE_ONETIME/CUSTOMER/TE_AMORTIZED'),F('concept','text','1-Fixed/5-Integrated'),F('cavity_or_feed','num',''),F('cycle_or_spm','num',''),F('purc_build','num',''),F('design_dev','num',''),F('capitalize_rm','num',''),F('expense','num',''),F('total_capital','num','=purc+dd+rm','CALC')],rel:[['1:N','cer_depreciation_schedule']]},
+  cer_capex_followon:{tag:'L2',c:'#ff6a00',d:'后续投资',src:'CAPEX!M60',ver:true,fields:[F('period_no','int',''),F('ownership','enum',''),F('process','text',''),F('amount','num','')]},
+  cer_bom:{tag:'L2',c:'#ff6a00',d:'BOM→原材料 (自引用层级)',src:'2483376-1',ver:true,fields:[F('cer_fg_id','fk','','FK'),F('parent_bom_id','fk','层级','FK'),F('level','enum','FG/BOM/RAW'),F('process','text','Purchasing/Stamping/Molding'),F('part_master_id','fk','','FK'),F('make_buy','enum','MAKE/BUY'),F('qty_per','num','每成品用量'),F('unit_price','num',''),F('markup_pct','num','6%'),F('line_cost','num','=qty×price×(1+mk)','CALC')],rel:[['N:1','cer_fg'],['self','cer_bom'],['N:1','part_master']]},
+  cer_process_step:{tag:'L2',c:'#ff6a00',d:'工艺路线',src:'2483376-1',ver:true,fields:[F('cer_fg_id','fk','','FK'),F('seq','int',''),F('process','text',''),F('station_qty','num',''),F('cycle_time','num',''),F('spm','num','')]},
+  cer_conversion_cost:{tag:'L2',c:'#ff6a00',d:'转换成本',src:'CER P&L 行62-67',ver:true,fields:[F('cer_fg_id','fk','','FK'),F('cost_type','enum','LABOR/OVERHEAD/DEPRECIATION/FREIGHT'),F('basis','text',''),F('unit_cost','num','$/ea')]},
+
+  cer_depreciation_schedule:{tag:'L3',c:'#7c3aed',d:'折旧计划表',src:'Capital Depreciation',fields:[F('cer_capex_item_id','fk','NULL=资产池','FK'),F('period_no','int',''),F('depreciation','num',''),F('allocation_volume','num','分摊基准'),F('unit_depreciation','num','$/pc 回流')]},
+  cer_cost_rollup:{tag:'L3',c:'#7c3aed',d:'成本卷积',src:'CER P&L 行55-71',fields:[F('cer_fg_id','fk','NULL=项目加权','FK'),F('period_no','int',''),F('material','num',''),F('labor','num',''),F('overhead','num',''),F('capital_depreciation','num',''),F('total_mfg_cost','num',''),F('unit_cost','num','$2.198'),F('std_margin_pct','num','41.0%')]},
+  cer_pnl:{tag:'L3',c:'#7c3aed',d:'P&L 矩阵 (×4 类型)',src:'CER P&L / TE Project / Incremental',fields:[F('pnl_type','enum','TE_PROJECT/CER/INCR_*'),F('period_no','int','0..N'),F('line_item','text','Sales/Material/OI...'),F('amount','num','')]},
+  cer_financial_metric:{tag:'L3',c:'#7c3aed',d:'财务指标',src:'Data for PAC / ROIC',fields:[F('scope','enum','OVERALL/INCREMENTAL'),F('metric','text','NPV/IRR/ROIC/PAYBACK'),F('value','num','NPV $4.67M')]},
+  cer_sensitivity:{tag:'L3',c:'#7c3aed',d:'敏感性分析',src:'Data for PAC!B55 / S1-S3',fields:[F('scenario_label','text','100%/75%/50%'),F('volume_factor','num',''),F('total_sales','num',''),F('payback_years','num','')]},
+  cer_checklist_item:{tag:'L3',c:'#7c3aed',d:'校验清单',src:'CHECK LIST',fields:[F('check_group','text','SALES/MFG_COST/...'),F('item','text',''),F('status','enum','OK/CHECK/NA'),F('note','text','')]},
+
+  approval_step:{tag:'L4',c:'#64748b',d:'审批节点',src:'CHECK LIST!B41-B59',fields:[F('gate','enum',''),F('level','int','L1..L5'),F('role','text',''),F('approver_id','fk',''),F('decision','enum',''),F('decided_at','ts','')]},
+  audit_log:{tag:'L4',c:'#64748b',d:'字段级审计',src:'—',fields:[F('entity','text',''),F('field','text',''),F('old_value','text',''),F('new_value','text',''),F('user_id','fk',''),F('ts','ts','')]},
+  attachment:{tag:'L4',c:'#64748b',d:'附件',src:'—',fields:[F('file_name','text',''),F('kind','text','RFQ/QUOTE/DRAWING'),F('blob_ref','text','')]},
+};
+
+// render layers
+const layersEl=document.getElementById('layers');
+layersEl.innerHTML=LAYERS.map(L=>`
+  <div class="layer">
+    <div class="layer-h"><span class="lc" style="background:${L.color}">${L.id}</span><div><h3>${L.name}</h3><div class="ld">${L.desc}</div></div><span class="cnt">${L.ents.length} 实体</span></div>
+    <div class="ents">${L.ents.map(e=>{const m=E[e];const vt=m.ver?'<span class="vt ver">VER</span>':(m.snap?'<span class="vt snap">1:1</span>':'');return `<div class="ent" data-e="${e}"><div class="en"><span class="dot" style="background:${m.c}"></span>${e}</div><div class="ed">${m.d}</div>${vt}</div>`;}).join('')}</div>
+  </div>`).join('');
+
+// detail panel
+function showEntity(name){
+  const m=E[name];if(!m)return;
+  document.querySelectorAll('.ent').forEach(x=>{x.classList.remove('sel','rel','dim');});
+  const relNames=new Set((m.rel||[]).map(r=>r[1]));
+  document.querySelectorAll('.ent').forEach(x=>{
+    const en=x.dataset.e;
+    if(en===name)x.classList.add('sel');
+    else if(relNames.has(en))x.classList.add('rel');
+    else x.classList.add('dim');
+  });
+  document.getElementById('dtEmpty').style.display='none';
+  const c=document.getElementById('dtContent');c.style.display='block';
+  const flagBadge=f=>f.flag==='PK'?'<span class="pk">PK</span>':f.flag==='FK'?'<span class="fkk">FK</span>':f.flag==='CALC'?'<span class="calc">CALC</span>':'';
+  c.innerHTML=`
+    <div class="dt-h">
+      <span class="tag" style="background:${m.c}22;color:${m.c}">${m.tag} ${m.ver?'· 版本化':(m.snap?'· 1:1 快照':'')}</span>
+      <div class="nm">${name}</div>
+      <div class="ds">${m.d}</div>
+      <div class="dt-src">来源 <span class="xls">${m.src}</span></div>
+    </div>
+    <div class="dt-sec">
+      <div class="st">字段 (${m.fields.length})</div>
+      ${m.fields.map(f=>`<div class="field"><span class="fk">${f.k}</span><span class="ft">${f.t}</span><span class="fd">${f.d||''}</span>${flagBadge(f)}</div>`).join('')}
+    </div>
+    ${m.rel?`<div class="dt-sec"><div class="st">关联关系</div><div class="rel-list">${m.rel.map(r=>`<div class="rel-item" data-go="${r[1]}"><span class="rk">${r[0]}</span><span class="rn">${r[1]}</span></div>`).join('')}</div></div>`:''}
+  `;
+  c.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{if(E[b.dataset.go])showEntity(b.dataset.go);});
+}
+layersEl.addEventListener('click',e=>{const t=e.target.closest('.ent');if(t)showEntity(t.dataset.e);});
+
+// view switch
+document.getElementById('viewseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#viewseg button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+b.dataset.v));
+});
+
+// default
+showEntity('cer_version');
+</script>
+</body>
+</html>
