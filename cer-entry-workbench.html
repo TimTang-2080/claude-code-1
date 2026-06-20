@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>录入工作台 · CAPEX & Cost Breakdown · PRJ-24-000902644</title>
+<style>
+  :root{
+    --navy:#0e1726;--navy-2:#16233a;--ink:#0f172a;--slate:#475569;--slate-2:#64748b;--muted:#94a3b8;
+    --line:#e6eaf0;--line-2:#eef2f7;--bg:#f4f6fa;--card:#fff;
+    --te:#ff6a00;--te-soft:#fff1e6;--blue:#2563eb;--blue-soft:#eaf1ff;
+    --green:#0f9d58;--green-soft:#e7f6ee;--amber:#d98a00;--amber-soft:#fff5e1;
+    --red:#e1442f;--red-soft:#fdecea;--violet:#7c3aed;--teal:#0d9488;--excel:#217346;
+    --radius:13px;--shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.18);
+    --font:'Segoe UI',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+    --mono:'SF Mono','Cascadia Code',ui-monospace,'Roboto Mono',monospace;
+    --gridline:#e3e8ef;--sel:#2563eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--te);color:#fff}
+  *::-webkit-scrollbar{width:10px;height:10px}
+  *::-webkit-scrollbar-thumb{background:#c7d0dd;border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+  *::-webkit-scrollbar-thumb:hover{background:#aab6c7;background-clip:padding-box}
+
+  .app{display:grid;grid-template-columns:248px 1fr;height:100vh;overflow:hidden}
+  .sidebar{background:linear-gradient(180deg,var(--navy),#0b1320);color:#cbd5e1;display:flex;flex-direction:column;min-height:0}
+  .brand{display:flex;align-items:center;gap:11px;padding:18px 18px 16px}
+  .brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--te),#ff9248);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px;box-shadow:0 6px 16px -6px rgba(255,106,0,.7)}
+  .brand .name{font-size:15px;font-weight:700;color:#fff}
+  .brand .sub{font-size:10.5px;color:#7e8aa0;letter-spacing:.6px;text-transform:uppercase}
+  .nav{padding:6px 12px;overflow-y:auto;flex:1}
+  .nav-group{margin-top:14px}
+  .nav-group .gl{font-size:10px;font-weight:700;letter-spacing:1px;color:#5d6b85;text-transform:uppercase;padding:6px 12px}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:#aab6cb;cursor:pointer;font-size:12.5px;font-weight:500;position:relative}
+  .nav-item .ico{width:17px;height:17px;opacity:.85}
+  .nav-item .badge{margin-left:auto;font-size:10px;background:#243250;color:#9fb0cc;padding:1px 7px;border-radius:20px;font-weight:700}
+  .nav-item:hover{background:#16233a;color:#e6ecf5}
+  .nav-item.active{background:linear-gradient(90deg,rgba(255,106,0,.16),rgba(255,106,0,.02));color:#fff}
+  .nav-item.active::before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:3px;background:var(--te)}
+  .side-foot{padding:12px;border-top:1px solid #1b2740}
+  .userbox{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:10px}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px}
+  .userbox .un{font-size:12.5px;color:#e6ecf5;font-weight:600}
+  .userbox .ur{font-size:10.5px;color:#7e8aa0}
+
+  .main{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .topbar{height:56px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 22px;flex:none}
+  .crumbs{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--slate-2)}
+  .crumbs b{color:var(--ink);font-weight:600}.crumbs .sep{color:#cbd5e1}
+  .switcher{margin-left:auto;display:flex;background:#f1f4f9;border-radius:9px;padding:3px}
+  .switcher a{text-decoration:none;font-size:11.5px;font-weight:600;color:var(--slate-2);padding:6px 12px;border-radius:7px}
+  .switcher a.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+
+  /* header */
+  .head{background:var(--card);border-bottom:1px solid var(--line);padding:13px 22px 0;flex:none}
+  .head-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .h-id{font-family:var(--mono);font-size:11px;color:var(--te);font-weight:700}
+  .h-name{font-size:16px;font-weight:700;display:flex;align-items:center;gap:9px}
+  .chip{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px;background:#f1f4f9;color:var(--slate)}
+  .chip.te{background:var(--te-soft);color:var(--te)}.chip.bl{background:var(--blue-soft);color:var(--blue)}
+  .chip.gr{background:var(--green-soft);color:var(--green)}.chip.am{background:var(--amber-soft);color:#a86a00}
+  .h-right{margin-left:auto;display:flex;gap:9px}
+  .btn{height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .btn:hover{background:#f6f8fc;border-color:#d7e0ee}
+  .btn.primary{background:linear-gradient(135deg,var(--te),#ff8a33);color:#fff;border-color:transparent}
+  .btn.sm{height:30px;padding:0 11px;font-size:11.5px}
+  .btn.gst{border-color:transparent;background:transparent}.btn.gst:hover{background:#f1f4f9}
+
+  .subtabs{display:flex;gap:2px;margin-top:12px}
+  .subtab{padding:10px 16px;font-size:12.5px;font-weight:600;color:var(--slate-2);cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;gap:8px}
+  .subtab:hover{color:var(--ink)}
+  .subtab.active{color:var(--te);border-bottom-color:var(--te)}
+  .subtab .ic{width:16px;height:16px}
+
+  /* live summary bar */
+  .sumbar{display:flex;align-items:stretch;gap:0;background:linear-gradient(180deg,#0e1726,#16233a);color:#fff;border-radius:12px;margin:14px 22px 0;overflow:hidden;box-shadow:0 10px 30px -16px rgba(14,23,38,.7)}
+  .sumbar .sb{flex:1;padding:11px 16px;border-right:1px solid rgba(255,255,255,.08);position:relative}
+  .sumbar .sb:last-child{border-right:none}
+  .sumbar .sbl{font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
+  .sumbar .sbv{font-size:20px;font-weight:800;margin-top:3px;font-feature-settings:"tnum";transition:color .25s}
+  .sumbar .sbv small{font-size:11px;color:#94a3b8;font-weight:600}
+  .sumbar .sbv.flash{color:#ffd9b0}
+  .sumbar .sbc{font-size:10px;color:#7e8aa0;margin-top:1px}
+  .sumbar .accent{color:var(--te)}
+
+  /* formula bar + toolbar */
+  .toolbar{display:flex;align-items:center;gap:8px;padding:11px 22px;flex:none;flex-wrap:wrap}
+  .cellref{font-family:var(--mono);font-size:12px;font-weight:700;background:#fff;border:1px solid var(--line);border-radius:8px;height:32px;min-width:64px;display:flex;align-items:center;justify-content:center;color:var(--slate);padding:0 8px}
+  .fxbar{flex:1;min-width:200px;max-width:560px;height:32px;background:#fff;border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 11px}
+  .fxbar .fxi{color:var(--muted);font-style:italic;font-family:var(--mono);font-size:12px}
+  .fxbar input{border:none;outline:none;flex:1;font-size:12.5px;font-family:var(--mono);background:none;color:var(--ink)}
+  .tdiv{width:1px;height:22px;background:var(--line)}
+  .seg{display:inline-flex;background:#eef1f6;border-radius:8px;padding:3px;gap:2px}
+  .seg button{border:none;background:transparent;font-size:11.5px;font-weight:700;color:var(--slate-2);padding:5px 12px;border-radius:6px;cursor:pointer}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .kbd{font-family:var(--mono);font-size:10px;background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--slate-2)}
+  .hint{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+  .content{flex:1;overflow:auto;min-height:0;padding:6px 22px 40px}
+  .pane{display:none}.pane.active{display:block}
+
+  /* section card */
+  .sec{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+  .sec-h{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid var(--line-2);background:#fcfdfe}
+  .sec-h .tag{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff}
+  .sec-h h3{font-size:13px;font-weight:700}
+  .sec-h .meta{font-size:11px;color:var(--muted)}
+  .sec-h .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .sec-h .subtot{font-family:var(--mono);font-size:12.5px;font-weight:800;color:var(--ink)}
+  .sec-h .subtot small{color:var(--muted);font-weight:600;font-size:10.5px}
+
+  /* ===== GRID ===== */
+  .gridwrap{overflow:auto;outline:none}
+  table.grid{border-collapse:separate;border-spacing:0;font-size:12px;table-layout:fixed;width:max-content;min-width:100%}
+  table.grid th,table.grid td{border-right:1px solid var(--gridline);border-bottom:1px solid var(--gridline);padding:0;position:relative;height:30px;background:#fff}
+  table.grid thead th{position:sticky;top:0;z-index:5;background:#f4f6fa;color:var(--slate-2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;text-align:center;vertical-align:middle;padding:4px 6px;border-bottom:1px solid var(--line);user-select:none;line-height:1.2}
+  table.grid thead th .uh{display:block;font-size:8.5px;color:var(--muted);font-weight:600;text-transform:none}
+  table.grid .rownum{position:sticky;left:0;z-index:4;background:#f4f6fa;color:var(--muted);font-size:10px;font-weight:700;text-align:center;width:34px;min-width:34px;max-width:34px;user-select:none}
+  table.grid thead .corner{position:sticky;left:0;z-index:6;background:#eef1f6;width:34px}
+  table.grid td .cv{display:block;padding:5px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:100%;line-height:20px}
+  td.num .cv,th.num{text-align:right;font-family:var(--mono);font-feature-settings:"tnum"}
+  td.calc{background:#f7f9fc}
+  td.calc .cv{color:#0f766e;font-weight:700;font-family:var(--mono);text-align:right}
+  td.txt .cv{color:var(--ink)}
+  td.sel-cell{box-shadow:inset 0 0 0 2px var(--sel);z-index:3}
+  td.in-range{background:rgba(37,99,235,.08)}
+  td.in-range.calc{background:rgba(37,99,235,.12)}
+  td .editor{position:absolute;inset:0;width:100%;height:100%;border:2px solid var(--sel);outline:none;font:inherit;font-size:12px;padding:3px 6px;background:#fff;z-index:8;font-family:var(--font)}
+  td .editor.num{text-align:right;font-family:var(--mono)}
+  td select.editor{padding:1px 4px}
+  .pnlink .cv{font-family:var(--mono);color:var(--blue)}
+  td.warn{background:var(--red-soft)}
+  td .badge-own{font-size:9px;padding:1px 6px;border-radius:10px;font-weight:700}
+  .own-te{background:var(--blue-soft);color:var(--blue)}
+  .own-cust{background:var(--amber-soft);color:#a86a00}
+  .own-amort{background:#f3ecff;color:var(--violet)}
+  tr.grp-row td{background:#eef3fb!important;font-weight:700;color:var(--blue);font-size:10.5px;letter-spacing:.3px;text-transform:uppercase}
+  tr.grp-row td .cv{color:var(--blue)}
+  .delcol{width:30px;min-width:30px;text-align:center}
+  .del{cursor:pointer;color:#cbd5e1;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px}
+  .del:hover{color:var(--red);background:var(--red-soft)}
+
+  .secfoot{display:flex;align-items:center;gap:10px;padding:8px 14px;border-top:1px solid var(--line-2);background:#fcfdfe}
+  .addrow{font-size:11.5px;font-weight:600;color:var(--blue);cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:7px}
+  .addrow:hover{background:var(--blue-soft)}
+  .secfoot .ft-r{margin-left:auto;font-size:11px;color:var(--muted)}
+
+  /* rollup panel (cost breakdown) */
+  .two{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start}
+  @media(max-width:1200px){.two{grid-template-columns:1fr}}
+  .rollup{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);position:sticky;top:6px}
+  .rollup .rh{padding:13px 16px;border-bottom:1px solid var(--line-2);font-weight:700;font-size:13px;display:flex;align-items:center;gap:9px}
+  .rollup .rh .ch-ico{width:26px;height:26px;border-radius:7px;background:var(--te-soft);color:var(--te);display:grid;place-items:center}
+  .ru-row{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid var(--line-2);font-size:12px}
+  .ru-row .l{color:var(--slate);display:flex;align-items:center;gap:8px}
+  .ru-row .v{font-family:var(--mono);font-weight:700;font-feature-settings:"tnum"}
+  .ru-row .bar{height:5px;border-radius:4px;background:#eef1f6;width:70px;overflow:hidden}
+  .ru-row .bar i{display:block;height:100%;border-radius:4px;background:var(--blue)}
+  .ru-row.sub{background:#f8fafd;font-weight:700}
+  .ru-row.sub .l{color:var(--ink);font-weight:700}
+  .ru-tot{background:#0e1726;color:#fff;padding:13px 16px;display:flex;align-items:center;justify-content:space-between}
+  .ru-tot .l{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+  .ru-tot .v{font-size:24px;font-weight:800;font-family:var(--mono);transition:color .25s}
+  .ru-tot .v.flash{color:#ffd9b0}
+  .margin-chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .swatch{width:9px;height:9px;border-radius:3px;flex:none}
+
+  .note{display:flex;gap:10px;background:var(--blue-soft);border:1px solid #d4e2ff;border-radius:11px;padding:11px 13px;font-size:11.5px;color:#1e40af;margin-bottom:14px}
+  .note .ni{flex:none}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#0e1726;color:#fff;padding:9px 18px;border-radius:10px;font-size:12.5px;font-weight:600;box-shadow:0 16px 40px -12px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.25s;z-index:50;display:flex;align-items:center;gap:9px}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast .tk{font-family:var(--mono);font-size:10px;background:rgba(255,255,255,.15);padding:1px 6px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">TE</div><div><div class="name">CER Cockpit</div><div class="sub">Capital Expenditure</div></div></div>
+    <nav class="nav">
+      <div class="nav-group"><div class="gl">工作区</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>仪表盘</div>
+        <div class="nav-item active"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 16h6M9 8h2"/><rect x="4" y="3" width="16" height="18" rx="2"/></svg>CER 申请<span class="badge">18</span></div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>审批待办<span class="badge">5</span></div>
+      </div>
+      <div class="nav-group"><div class="gl">主数据</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg>项目库</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v4a1 1 0 001 1h4M5 3h9l5 5v11a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>模具 & 设备台账</div>
+        <div class="nav-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L9 18l-5-5"/></svg>原材料价格库</div>
+      </div>
+    </nav>
+    <div class="side-foot"><div class="userbox"><div class="avatar">TT</div><div style="flex:1"><div class="un">Tim Tang</div><div class="ur">Cost Engineering · APAC</div></div></div></div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumbs"><span>CER 申请</span><span class="sep">/</span><span>PRJ-24-000902644</span><span class="sep">/</span><b>录入工作台</b></div>
+      <div class="switcher">
+        <a href="cer-cockpit-poc.html">① Cockpit</a>
+        <a href="cer-template-replica.html">② 模板复刻</a>
+        <a class="on" href="cer-entry-workbench.html">③ 录入工作台</a>
+      </div>
+    </div>
+
+    <div class="head">
+      <div class="head-top">
+        <div>
+          <div class="h-id">PRJ-24-000902644 · 2483376-1</div>
+          <div class="h-name">Charging Inlet — Gen 2 GB Actuator <span class="chip te">G4</span><span class="chip bl">NPI · Localization</span></div>
+        </div>
+        <div class="h-right">
+          <button class="btn gst" id="undoBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6M3 13a9 9 0 103-7"/></svg>撤销</button>
+          <button class="btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v4a1 1 0 001 1h4M5 3h9l5 5v11a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>导入 Excel</button>
+          <button class="btn primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>保存草稿</button>
+        </div>
+      </div>
+      <div class="subtabs" id="subtabs">
+        <div class="subtab active" data-pane="capex"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>CAPEX 投资录入</div>
+        <div class="subtab" data-pane="cost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 16l3-3 3 2 4-5"/></svg>Cost Breakdown 成本拆解</div>
+      </div>
+    </div>
+
+    <!-- live summary bar -->
+    <div class="sumbar" id="sumbar">
+      <div class="sb"><div class="sbl">Capital 投资合计</div><div class="sbv" id="sb_cap">¥0</div><div class="sbc" id="sb_cap_usd">$0</div></div>
+      <div class="sb"><div class="sbl">Expense 费用合计</div><div class="sbv" id="sb_exp">¥0</div><div class="sbc" id="sb_exp_usd">$0</div></div>
+      <div class="sb"><div class="sbl">折旧池 (Depreciation)</div><div class="sbv" id="sb_dep">¥0</div><div class="sbc">直线 55 个月</div></div>
+      <div class="sb"><div class="sbl">单件成本 Unit Cost</div><div class="sbv accent" id="sb_uc">$0</div><div class="sbc">含折旧分摊</div></div>
+      <div class="sb"><div class="sbl">Std Margin %</div><div class="sbv" id="sb_mar">0%</div><div class="sbc">ASP $3.728 / ea</div></div>
+    </div>
+
+    <!-- toolbar / formula bar -->
+    <div class="toolbar">
+      <div class="cellref" id="cellref">—</div>
+      <div class="fxbar"><span class="fxi">ƒx</span><input id="fxinput" placeholder="选中单元格后在此编辑…" autocomplete="off"></div>
+      <div class="tdiv"></div>
+      <div class="seg" id="curseg"><button class="on" data-cur="CNY">CNY</button><button data-cur="USD">USD</button></div>
+      <span class="chip">FX 7.24218</span>
+      <div class="tdiv"></div>
+      <button class="btn sm" id="filldown"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg>向下填充 <span class="kbd">⌘D</span></button>
+      <button class="btn sm" id="addRowBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>新增行</button>
+      <div class="hint" style="margin-left:auto">
+        <span class="kbd">↹/↵</span>移动 <span class="kbd">⌘C/⌘V</span>复制粘贴 <span class="kbd">Del</span>清除 · 支持从 Excel 直接粘贴整块
+      </div>
+    </div>
+
+    <div class="content" id="content">
+
+      <!-- ===== CAPEX PANE ===== -->
+      <div class="pane active" id="pane-capex">
+        <div class="note"><svg class="ni" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+          <div><b>Total</b> = Purc/Build + Design&amp;Develop + Capitalize RM（公式列自动计算，浅底不可改）。所有 Capital 行进入折旧池；Ownership 选 <b>Customer</b> 时不计入 TE 折旧。Expense 当期费用化。</div>
+        </div>
+
+        <div class="sec" data-sec="MOLD">
+          <div class="sec-h"><span class="tag" style="background:var(--blue)">M</span><h3>[MOLD] 注塑模具</h3><span class="meta">CAPEX!A21 · 一模到底 / Integrated</span>
+            <div class="right"><span class="subtot" id="tot_MOLD">¥0 <small>Total</small></span></div></div>
+          <div class="gridwrap" tabindex="0" id="grid_MOLD"></div>
+          <div class="secfoot"><span class="addrow" data-add="MOLD"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>新增模具行</span><span class="ft-r" id="cnt_MOLD"></span></div>
+        </div>
+
+        <div class="sec" data-sec="DIE">
+          <div class="sec-h"><span class="tag" style="background:var(--te)">D</span><h3>[DIE] 冲压模 / 外购件模</h3><span class="meta">CAPEX!A11</span>
+            <div class="right"><span class="subtot" id="tot_DIE">¥0 <small>Total</small></span></div></div>
+          <div class="gridwrap" tabindex="0" id="grid_DIE"></div>
+          <div class="secfoot"><span class="addrow" data-add="DIE"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>新增冲压模行</span><span class="ft-r" id="cnt_DIE"></span></div>
+        </div>
+
+        <div class="sec" data-sec="ASSY">
+          <div class="sec-h"><span class="tag" style="background:var(--violet)">A</span><h3>[ASS'Y M/C] 装配设备</h3><span class="meta">CAPEX!A44 · 本项目暂无</span>
+            <div class="right"><span class="subtot" id="tot_ASSY">¥0 <small>Total</small></span></div></div>
+          <div class="gridwrap" tabindex="0" id="grid_ASSY"></div>
+          <div class="secfoot"><span class="addrow" data-add="ASSY"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>新增设备行</span><span class="ft-r" id="cnt_ASSY"></span></div>
+        </div>
+
+        <div class="sec" data-sec="OTHERS">
+          <div class="sec-h"><span class="tag" style="background:#0d9488">O</span><h3>[OTHERS] 费用化支出 (Expense)</h3><span class="meta">CAPEX!A51 · 不折旧</span>
+            <div class="right"><span class="subtot" id="tot_OTHERS">¥0 <small>Expense</small></span></div></div>
+          <div class="gridwrap" tabindex="0" id="grid_OTHERS"></div>
+          <div class="secfoot"><span class="addrow" data-add="OTHERS"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>新增费用行</span><span class="ft-r" id="cnt_OTHERS"></span></div>
+        </div>
+      </div>
+
+      <!-- ===== COST BREAKDOWN PANE ===== -->
+      <div class="pane" id="pane-cost">
+        <div class="two">
+          <div>
+            <div class="note"><svg class="ni" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+              <div><b>Line Cost</b> = Q'ty × Unit Price × (1 + Markup)。成品 → BOM 组件 → 原材料逐级 roll-up；右侧面板实时汇总单件成本与毛利。</div>
+            </div>
+            <div class="sec" data-sec="MAT">
+              <div class="sec-h"><span class="tag" style="background:var(--blue)">B</span><h3>BOM 组件 / 原材料 (Purchasing)</h3><span class="meta">2483376-1 · 13 个本地化外购件</span>
+                <div class="right"><span class="subtot" id="tot_MAT">$0 <small>Material/ea</small></span></div></div>
+              <div class="gridwrap" tabindex="0" id="grid_MAT"></div>
+              <div class="secfoot"><span class="addrow" data-add="MAT"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>新增组件行</span><span class="ft-r" id="cnt_MAT"></span></div>
+            </div>
+            <div class="sec" data-sec="CONV">
+              <div class="sec-h"><span class="tag" style="background:var(--te)">C</span><h3>转换成本 (Labor / OH / Depreciation / Freight)</h3><span class="meta">CER P&amp;L 引用</span>
+                <div class="right"><span class="subtot" id="tot_CONV">$0 <small>Conversion/ea</small></span></div></div>
+              <div class="gridwrap" tabindex="0" id="grid_CONV"></div>
+              <div class="secfoot"><span class="addrow" data-add="CONV"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>新增成本项</span><span class="ft-r" id="cnt_CONV"></span></div>
+            </div>
+          </div>
+
+          <div class="rollup">
+            <div class="rh"><span class="ch-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-9-9v9z"/></svg></span>单件成本 Roll-up</div>
+            <div id="ru_breakdown"></div>
+            <div class="ru-row sub"><div class="l">Material 材料</div><div class="v" id="ru_mat">$0</div></div>
+            <div class="ru-row sub"><div class="l">Conversion 转换</div><div class="v" id="ru_conv">$0</div></div>
+            <div class="ru-tot"><div class="l">Weighted Avg Unit Cost</div><div class="v" id="ru_uc">$0</div></div>
+            <div class="ru-row" style="padding-top:12px"><div class="l">ASP 加权售价</div><div class="v">$3.728</div></div>
+            <div class="ru-row"><div class="l">Std Margin 标准毛利</div><div class="v" id="ru_margin"><span class="margin-chip chip gr">0%</span></div></div>
+            <div class="ru-row"><div class="l">年产量 (峰值)</div><div class="v">1,000,000</div></div>
+            <div class="ru-row" style="border-bottom:none"><div class="l">单件折旧分摊</div><div class="v" id="ru_depalloc">$0</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const FX=7.24218;
+let CUR='CNY';
+const $=id=>document.getElementById(id);
+const fmtNum=(v,d=0)=>{if(v===''||v==null||isNaN(v))return '';return Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});};
+const colLetter=i=>{let s='';i++;while(i>0){i--;s=String.fromCharCode(65+i%26)+s;i=Math.floor(i/26);}return s;};
+function toast(msg,kbd){const t=$('toast');t.innerHTML=msg+(kbd?` <span class="tk">${kbd}</span>`:'');t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);}
+
+/* ============ COLUMN SCHEMAS ============ */
+const OWN=[['TE-Onetime','TE 一次性','own-te'],['Customer','客户买断','own-cust'],['TE-Amortized','TE 摊销','own-amort']];
+function ownRender(v){const o=OWN.find(x=>x[0]===v)||OWN[0];return `<span class="badge-own ${o[2]}">${o[1]}</span>`;}
+
+// capital section columns (DIE/MOLD/ASSY) — header labels vary per section
+function capitalCols(labels){
+  return [
+    {k:'desc',h:'Description',w:210,t:'txt'},
+    {k:'pn',h:'P/N',w:84,t:'txt',cls:'pnlink'},
+    {k:'toolNo',h:'Tool No.',w:90,t:'txt',cls:'pnlink'},
+    {k:'concept',h:'Concept',w:118,t:'sel',opts:labels.concept},
+    {k:'cav',h:labels.cav,uh:labels.cavU,w:70,t:'num'},
+    {k:'cyc',h:labels.cyc,uh:labels.cycU,w:74,t:'num'},
+    {k:'lr',h:'L/R',uh:'M/HR',w:62,t:'num'},
+    {k:'mtl',h:'MTL',w:74,t:'txt'},
+    {k:'own',h:'Ownership',w:96,t:'sel',opts:OWN.map(o=>o[0]),render:ownRender},
+    {k:'wtGr',h:'Wt Gr',uh:'g/ea',w:60,t:'num',d:1},
+    {k:'wtNet',h:'Wt Net',uh:'g/ea',w:60,t:'num',d:1},
+    {k:'purc',h:'Purc/Build',uh:'CNY',w:96,t:'num'},
+    {k:'dd',h:'Design&Dev',uh:'CNY',w:96,t:'num'},
+    {k:'rm',h:'Cap. RM',uh:'CNY',w:84,t:'num'},
+    {k:'total',h:'Total',uh:'CNY',w:104,t:'calc',calc:r=>(+r.purc||0)+(+r.dd||0)+(+r.rm||0)},
+    {k:'exp',h:'Expense',uh:'CNY',w:84,t:'num'},
+  ];
+}
+const MOLD_LABELS={concept:['1-Fixed','2-Inter-Change','3-Hot Runner','4-Cold','5-Integrated','6-Family'],cav:'No.of CAV',cavU:'cav',cyc:'Cyc.Time',cycU:'sec/cyc'};
+const DIE_LABELS={concept:['1-Conventional','2-High Speed','3-Transfer'],cav:'Row/Feed',cavU:'',cyc:'S.P.M',cycU:'spm'};
+const ASSY_LABELS={concept:['MA-Manual','SE-Semi Auto','AU-Auto'],cav:'No.of Head',cavU:'head',cyc:'M/C Speed',cycU:'spm'};
+
+const OTHERS_COLS=[
+  {k:'desc',h:'Description',w:240,t:'txt'},
+  {k:'pn',h:'P/N',w:96,t:'txt',cls:'pnlink'},
+  {k:'toolNo',h:'Tool No.',w:96,t:'txt'},
+  {k:'cat',h:'Category',w:130,t:'sel',opts:['Growth Engineering','Soft Tooling','DV/PV Test','Safelaunch','Other']},
+  {k:'applic',h:'Applicable',w:150,t:'txt'},
+  {k:'own',h:'Ownership',w:96,t:'sel',opts:OWN.map(o=>o[0]),render:ownRender},
+  {k:'exp',h:'Expense',uh:'CNY',w:110,t:'num'},
+  {k:'dd',h:'Design&Dev',uh:'CNY',w:104,t:'num'},
+  {k:'total',h:'Total Exp',uh:'CNY',w:110,t:'calc',calc:r=>(+r.exp||0)+(+r.dd||0)},
+];
+
+const MAT_COLS=[
+  {k:'proc',h:'Process',w:104,t:'sel',opts:['Purchasing','Stamping','Plating','Molding','Assembly']},
+  {k:'desc',h:'Description',w:208,t:'txt'},
+  {k:'pn',h:'P/N',w:90,t:'txt',cls:'pnlink'},
+  {k:'mb',h:'Make/Buy',w:78,t:'sel',opts:['Buy','Make']},
+  {k:'cat',h:'Mtl Category',w:104,t:'sel',opts:['Purchasing','Resin','Metal','Plating','Stamping','Molding']},
+  {k:'qty',h:"Q'ty",uh:'/ea',w:60,t:'num',d:2},
+  {k:'price',h:'Unit Price',uh:'CNY',w:94,t:'num',d:3},
+  {k:'vp',h:'Vendor%',uh:'profit',w:72,t:'num',d:2},
+  {k:'mk',h:'Markup',uh:'TTL %',w:70,t:'num',d:2},
+  {k:'lineCNY',h:'Line Cost',uh:'CNY/ea',w:100,t:'calc',calc:r=>(+r.qty||0)*(+r.price||0)*(1+(+r.mk||0))},
+  {k:'lineUSD',h:'Line Cost',uh:'USD/ea',w:100,t:'calc',calc:r=>((+r.qty||0)*(+r.price||0)*(1+(+r.mk||0)))/FX},
+];
+
+const CONV_COLS=[
+  {k:'item',h:'Cost Item',w:220,t:'txt'},
+  {k:'basis',h:'Basis / Driver',w:200,t:'txt'},
+  {k:'rate',h:'Rate',w:90,t:'num',d:2},
+  {k:'usd',h:'Cost',uh:'USD/ea',w:120,t:'num',d:3},
+];
+
+/* ============ SEED DATA (editable) ============ */
+const data={
+  MOLD:[
+    ['ACTUATOR, GEN2 HSG','2483257-1','2483257-1/2','5-Integrated',4,28,0,'PA66-GF',637260,0,20000],
+    ['ACTUATOR, RELEASE LEVER','2483349-1','2483349-1/2','1-Fixed',2,22,0,'POM',80000,0,9050],
+    ['ACTUATOR, GEN2 COVER','2483380-1','2483380-1/2','1-Fixed',2,20,0,'PA66',70000,0,9000],
+    ['ACTUATOR, GEAR STAGE1','2483331-1','2483331-1','1-Fixed',1,18,0,'POM',60000,0,9000],
+    ['ACTUATOR, GEAR STAGE2','2483346-1','2483346-1','1-Fixed',1,18,0,'POM',60000,0,7000],
+    ['ACTUATOR, GEAR STAGE3','2483348-1','2483348-1','1-Fixed',1,18,0,'POM',60000,0,7000],
+    ['ACTUATOR, SEALING UNLOCK','2483371-1','2483371-1','3-Hot Runner',1,25,0,'TPE',100000,0,10000],
+    ['ACTUATOR, CLIP','2483372-1','2483372-1','1-Fixed',1,12,0,'PA66',35000,0,3500],
+    ['ACTUATOR, RELEASE ADAPTER','2483373-1','2483373-1','1-Fixed',1,14,0,'POM',35000,0,3500],
+    ['PIN SEALING','2486732-1','2486732-1','3-Hot Runner',1,22,0,'LSR',100000,0,10000],
+  ].map(r=>({desc:r[0],pn:r[1],toolNo:r[2],concept:r[3],cav:r[4],cyc:r[5],lr:r[6],mtl:r[7],own:'TE-Onetime',wtGr:'',wtNet:'',purc:r[8],dd:r[9],rm:r[10],exp:0})),
+  DIE:[
+    ['ACTUATOR, CONTACT SPRING','2483369-1','2483369-1','1-Conventional',2,320,0,'CuSn',120823.87,0,0],
+    ['ACTUATOR, 130 MOTOR','2483291-1','2497496-1','1-Conventional',1,0,0,'-',118823.87,0,0],
+    ['ACTUATOR, MOTOR GEAR','2483296-1','2498632-1','1-Conventional',1,0,0,'-',38000,0,0],
+    ['ACTUATOR, GREASE (BECHEM)','2498664-1','2497497-1','1-Conventional',1,0,0,'-',118823.87,0,0],
+  ].map(r=>({desc:r[0],pn:r[1],toolNo:r[2],concept:r[3],cav:r[4],cyc:r[5],lr:r[6],mtl:r[7],own:'TE-Onetime',wtGr:'',wtNet:'',purc:r[8],dd:r[9],rm:r[10],exp:0})),
+  ASSY:[],
+  OTHERS:[
+    {desc:'Engineer Hour 工程工时',pn:'',toolNo:'',cat:'Growth Engineering',applic:'NRE',own:'TE-Onetime',exp:20000,dd:0},
+    {desc:'Soft Tooling 软模',pn:'',toolNo:'',cat:'Soft Tooling',applic:'Pre-PPAP',own:'TE-Onetime',exp:450000,dd:0},
+    {desc:'DV/PV Test 验证测试',pn:'',toolNo:'',cat:'DV/PV Test',applic:'Validation',own:'TE-Onetime',exp:360000,dd:0},
+  ],
+  MAT:[
+    ['Purchasing','ACTUATOR, GEN2 HSG','2483257-1','Buy','Purchasing',1,3.20,5,0.06],
+    ['Purchasing','ACTUATOR, CONTACT SPRING','2483369-1','Buy','Purchasing',1,0.85,5,0.06],
+    ['Purchasing','ACTUATOR, RELEASE LEVER','2483349-1','Buy','Purchasing',1,0.70,5,0.06],
+    ['Purchasing','ACTUATOR, GEN2 COVER','2483380-1','Buy','Purchasing',1,0.95,5,0.06],
+    ['Purchasing','ACTUATOR, GEAR STAGE1','2483331-1','Buy','Purchasing',1,0.55,5,0.06],
+    ['Purchasing','ACTUATOR, GEAR STAGE2','2483346-1','Buy','Purchasing',1,0.55,5,0.06],
+    ['Purchasing','ACTUATOR, GEAR STAGE3','2483348-1','Buy','Purchasing',1,0.55,5,0.06],
+    ['Purchasing','ACTUATOR, 130 MOTOR','2483291-1','Buy','Purchasing',1,2.10,5,0.06],
+    ['Purchasing','ACTUATOR, MOTOR GEAR','2483296-1','Buy','Purchasing',1,0.65,5,0.06],
+    ['Purchasing','ACTUATOR, SEALING UNLOCK','2483371-1','Buy','Purchasing',1,0.60,5,0.06],
+    ['Purchasing','ACTUATOR, CLIP','2483372-1','Buy','Purchasing',1,0.25,5,0.06],
+    ['Purchasing','ACTUATOR, RELEASE ADAPTER','2483373-1','Buy','Purchasing',1,0.30,5,0.06],
+    ['Purchasing','PIN SEALING / GREASE','2486732-1','Buy','Purchasing',1,0.80,5,0.06],
+  ].map(r=>({proc:r[0],desc:r[1],pn:r[2],mb:r[3],cat:r[4],qty:r[5],price:r[6],vp:r[7],mk:r[8]})),
+  CONV:[
+    {item:'Direct Labor 直接人工',basis:'总装线工时 × 费率 56.62',rate:56.62,usd:0.195},
+    {item:'Overhead 制造费用',basis:'OH Rate (incl. existing line dep)',rate:0,usd:0.134},
+    {item:'Capital Depreciation 折旧',basis:'折旧池 ÷ 年产量',rate:0,usd:0.052},
+    {item:'Freight & Duty 运费关税',basis:'Inbound 1.6% + Outbound 1%',rate:0,usd:0.042},
+    {item:'Sustaining Engineering',basis:'2.85% of mfg',rate:0,usd:0.010},
+  ],
+};
+const SCHEMA={MOLD:capitalCols(MOLD_LABELS),DIE:capitalCols(DIE_LABELS),ASSY:capitalCols(ASSY_LABELS),OTHERS:OTHERS_COLS,MAT:MAT_COLS,CONV:CONV_COLS};
+
+/* ============ GRID ENGINE ============ */
+let activeGrid=null;
+const grids={};
+class Grid{
+  constructor(id,key){
+    this.wrap=$(id);this.key=key;this.cols=SCHEMA[key];this.rows=data[key];
+    this.sel={r:0,c:0};this.end={r:0,c:0};this.editing=null;this.dragging=false;
+    this.build();
+    this.wrap.addEventListener('focus',()=>{activeGrid=this;this.applySel();});
+    this.wrap.addEventListener('keydown',e=>this.onKey(e));
+    this.wrap.addEventListener('mousedown',e=>this.onMouseDown(e));
+    this.wrap.addEventListener('dblclick',e=>{const td=e.target.closest('td[data-r]');if(td)this.beginEdit(+td.dataset.r,+td.dataset.c);});
+    this.wrap.addEventListener('mouseover',e=>{if(!this.dragging)return;const td=e.target.closest('td[data-r]');if(td){this.end={r:+td.dataset.r,c:+td.dataset.c};this.applySel();}});
+  }
+  build(){
+    const t=document.createElement('table');t.className='grid';
+    const thead=document.createElement('thead');const hr=document.createElement('tr');
+    hr.innerHTML='<th class="corner"></th>'+this.cols.map((c,i)=>`<th class="${c.t==='num'||c.t==='calc'?'num':''}" style="width:${c.w}px">${c.h}${c.uh?`<span class="uh">${c.uh}</span>`:(c.h.length<10?'<span class="uh">&nbsp;</span>':'')}<span class="uh" style="color:#cbd5e1">${colLetter(i)}</span></th>`).join('')+'<th class="delcol"></th>';
+    thead.appendChild(hr);t.appendChild(thead);
+    this.tbody=document.createElement('tbody');t.appendChild(this.tbody);
+    this.wrap.innerHTML='';this.wrap.appendChild(t);this.renderBody();
+  }
+  cellText(row,col){
+    let v=row[col.k];
+    if(col.t==='calc')v=col.calc(row,this.rows);
+    if(col.render && col.t!=='calc')return v?col.render(v):'';
+    if(col.t==='num'||col.t==='calc'){
+      if(v===''||v==null)return '';
+      let n=+v;
+      if(col.k==='vp'||col.k==='mk')return (n*100).toFixed(col.d||0)+'%';
+      let d=col.d||0; if(col.uh==='CNY'||col.uh==='USD/ea'||col.uh==='CNY/ea'||col.k==='usd')d=Math.max(d, (col.k==='usd'||col.uh&&col.uh.includes('USD'))?3:0);
+      return fmtNum(n,d);
+    }
+    return v==null?'':String(v);
+  }
+  rawText(row,col){if(!row)return '';let v=row[col.k];if(v===''||v==null)return '';if(col.k==='vp'||col.k==='mk')return (+v*100);return v;}
+  renderBody(){
+    this.tbody.innerHTML=this.rows.map((row,r)=>{
+      const tds=this.cols.map((col,c)=>{
+        let cls=col.t==='calc'?'calc':(col.t==='num'?'num':'txt');
+        if(col.cls)cls+=' '+col.cls;
+        // currency display: convert CNY columns when USD selected
+        let disp=this.cellText(row,col);
+        if(CUR==='USD'&&(col.uh==='CNY')&&col.t!=='sel'){const n=+row[col.k]||0;disp=n?fmtNum(n/FX,0):'';}
+        if(CUR==='USD'&&col.k==='total'&&this.key!=='MAT'){const n=col.calc(row,this.rows)||0;disp=n?fmtNum(n/FX,0):'';}
+        return `<td class="${cls}" data-r="${r}" data-c="${c}"><span class="cv">${disp}</span></td>`;
+      }).join('');
+      return `<tr><td class="rownum">${r+1}</td>${tds}<td class="delcol"><span class="del" data-del="${r}">✕</span></td></tr>`;
+    }).join('');
+    this.applySel();
+  }
+  td(r,c){return this.tbody.querySelector(`td[data-r="${r}"][data-c="${c}"]`);}
+  applySel(){
+    this.tbody.querySelectorAll('td.sel-cell,td.in-range').forEach(td=>td.classList.remove('sel-cell','in-range'));
+    if(activeGrid!==this)return;
+    const r0=Math.min(this.sel.r,this.end.r),r1=Math.max(this.sel.r,this.end.r);
+    const c0=Math.min(this.sel.c,this.end.c),c1=Math.max(this.sel.c,this.end.c);
+    for(let r=r0;r<=r1;r++)for(let c=c0;c<=c1;c++){const td=this.td(r,c);if(td)td.classList.add('in-range');}
+    const a=this.td(this.sel.r,this.sel.c);if(a)a.classList.add('sel-cell');
+    this.updateFx();
+  }
+  updateFx(){
+    if(!this.rows.length){$('cellref').textContent='—';const fx=$('fxinput');fx.value='';fx.disabled=true;return;}
+    const col=this.cols[this.sel.c];
+    $('cellref').textContent=colLetter(this.sel.c)+(this.sel.r+1);
+    const fx=$('fxinput');
+    if(col.t==='calc'){fx.value='= '+(this.cols[this.sel.c].k)+' (自动)';fx.disabled=true;fx.style.color='#0f766e';}
+    else{fx.disabled=false;fx.style.color='';fx.value=this.rawText(this.rows[this.sel.r],col);}
+  }
+  select(r,c,extend){
+    r=Math.max(0,Math.min(this.rows.length-1,r));c=Math.max(0,Math.min(this.cols.length-1,c));
+    this.sel={r,c};if(!extend)this.end={r,c};else this.end={r,c};
+    if(extend){this.end={r,c};this.sel={r:this.sel.r,c:this.sel.c};}
+    this.applySel();this.scrollTo(r,c);
+  }
+  scrollTo(r,c){const td=this.td(r,c);if(td)td.scrollIntoView({block:'nearest',inline:'nearest'});}
+  onMouseDown(e){
+    const del=e.target.closest('[data-del]');if(del){this.rows.splice(+del.dataset.del,1);recalc();this.renderBody();return;}
+    const td=e.target.closest('td[data-r]');if(!td)return;
+    this.wrap.focus();activeGrid=this;
+    const r=+td.dataset.r,c=+td.dataset.c;
+    if(e.shiftKey){this.end={r,c};this.applySel();}
+    else{this.sel={r,c};this.end={r,c};this.dragging=true;this.applySel();}
+  }
+  onKey(e){
+    if(this.editing)return;
+    if(!this.rows.length)return;
+    const k=e.key;
+    const meta=e.ctrlKey||e.metaKey;
+    if(meta&&(k==='c'||k==='C')){this.copy();e.preventDefault();return;}
+    if(meta&&(k==='x'||k==='X')){this.copy();this.clearRange();e.preventDefault();return;}
+    if(meta&&(k==='d'||k==='D')){this.fillDown();e.preventDefault();return;}
+    if(meta)return; // let paste etc bubble to document handler
+    if(k==='ArrowUp'){this.move(-1,0,e.shiftKey);e.preventDefault();}
+    else if(k==='ArrowDown'){this.move(1,0,e.shiftKey);e.preventDefault();}
+    else if(k==='ArrowLeft'){this.move(0,-1,e.shiftKey);e.preventDefault();}
+    else if(k==='ArrowRight'){this.move(0,1,e.shiftKey);e.preventDefault();}
+    else if(k==='Tab'){this.move(0,e.shiftKey?-1:1,false);e.preventDefault();}
+    else if(k==='Enter'){this.beginEdit(this.sel.r,this.sel.c);e.preventDefault();}
+    else if(k==='F2'){this.beginEdit(this.sel.r,this.sel.c);e.preventDefault();}
+    else if(k==='Delete'||k==='Backspace'){this.clearRange();e.preventDefault();}
+    else if(k.length===1&&!e.altKey){this.beginEdit(this.sel.r,this.sel.c,k);}
+  }
+  move(dr,dc,extend){
+    const r=(extend?this.end.r:this.sel.r)+dr, c=(extend?this.end.c:this.sel.c)+dc;
+    if(extend){this.end={r:Math.max(0,Math.min(this.rows.length-1,r)),c:Math.max(0,Math.min(this.cols.length-1,c))};this.applySel();}
+    else this.select(r,c,false);
+  }
+  beginEdit(r,c,initial){
+    if(!this.rows[r])return;
+    const col=this.cols[c];if(col.t==='calc')return;
+    this.sel={r,c};this.end={r,c};this.applySel();
+    const td=this.td(r,c);const row=this.rows[r];
+    this.editing={r,c};
+    let ed;
+    if(col.t==='sel'){
+      ed=document.createElement('select');ed.className='editor';
+      ed.innerHTML=col.opts.map(o=>`<option ${row[col.k]===o?'selected':''}>${o}</option>`).join('');
+      td.querySelector('.cv').style.visibility='hidden';td.appendChild(ed);ed.focus();
+      ed.addEventListener('change',()=>{row[col.k]=ed.value;this.commit(1,0);});
+      ed.addEventListener('blur',()=>{if(this.editing){row[col.k]=ed.value;this.commit(0,0);}});
+      ed.addEventListener('keydown',ev=>{if(ev.key==='Escape'){this.cancel();ev.stopPropagation();}if(ev.key==='Enter'){row[col.k]=ed.value;this.commit(1,0);ev.preventDefault();}});
+    }else{
+      ed=document.createElement('input');ed.className='editor'+(col.t==='num'?' num':'');
+      ed.value=initial!=null?initial:this.rawText(row,col);
+      td.querySelector('.cv').style.visibility='hidden';td.appendChild(ed);ed.focus();
+      if(initial==null)ed.select();else ed.setSelectionRange(ed.value.length,ed.value.length);
+      ed.addEventListener('keydown',ev=>{
+        if(ev.key==='Enter'){this.writeInput(ed,col,row);this.commit(1,0);ev.preventDefault();}
+        else if(ev.key==='Tab'){this.writeInput(ed,col,row);this.commit(0,ev.shiftKey?-1:1);ev.preventDefault();}
+        else if(ev.key==='Escape'){this.cancel();ev.preventDefault();ev.stopPropagation();}
+      });
+      ed.addEventListener('blur',()=>{if(this.editing){this.writeInput(ed,col,row);this.commit(0,0);}});
+    }
+  }
+  writeInput(ed,col,row){
+    let v=ed.value.trim();
+    if(col.t==='num'){
+      v=v.replace(/[,$¥%\s]/g,'');
+      let n=v===''?'':parseFloat(v);
+      if(col.k==='vp'||col.k==='mk')n=v===''?'':parseFloat(v)/100;
+      row[col.k]=(v===''||isNaN(n))?'':n;
+    }else row[col.k]=v;
+  }
+  commit(dr,dc){
+    this.editing=null;recalc();this.renderBody();
+    this.wrap.focus();this.select(this.sel.r+dr,this.sel.c+dc,false);
+  }
+  cancel(){this.editing=null;this.renderBody();this.wrap.focus();this.applySel();}
+  range(){return{r0:Math.min(this.sel.r,this.end.r),r1:Math.max(this.sel.r,this.end.r),c0:Math.min(this.sel.c,this.end.c),c1:Math.max(this.sel.c,this.end.c)};}
+  copy(){
+    const {r0,r1,c0,c1}=this.range();const lines=[];
+    for(let r=r0;r<=r1;r++){const cells=[];for(let c=c0;c<=c1;c++){const col=this.cols[c];let v=col.t==='calc'?col.calc(this.rows[r],this.rows):this.rawText(this.rows[r],col);cells.push(v==null?'':v);}lines.push(cells.join('\t'));}
+    const txt=lines.join('\n');
+    navigator.clipboard&&navigator.clipboard.writeText(txt).catch(()=>{});
+    this._clip=txt;toast('已复制 '+((r1-r0+1)*(c1-c0+1))+' 个单元格','⌘C');
+  }
+  clearRange(){const {r0,r1,c0,c1}=this.range();for(let r=r0;r<=r1;r++)for(let c=c0;c<=c1;c++){const col=this.cols[c];if(col.t!=='calc')this.rows[r][col.k]='';}recalc();this.renderBody();}
+  fillDown(){
+    const {r0,r1,c0,c1}=this.range();if(r1<=r0)return;
+    for(let c=c0;c<=c1;c++){const col=this.cols[c];if(col.t==='calc')continue;const v=this.rows[r0][col.k];for(let r=r0+1;r<=r1;r++)this.rows[r][col.k]=v;}
+    recalc();this.renderBody();toast('已向下填充','⌘D');
+  }
+  paste(txt){
+    const matrix=txt.replace(/\r/g,'').replace(/\n$/,'').split('\n').map(l=>l.split('\t'));
+    let {r,c}=this.sel;
+    for(let i=0;i<matrix.length;i++){
+      if(r+i>=this.rows.length)this.addRow();
+      let cc=c;
+      for(let j=0;j<matrix[i].length;j++){
+        while(cc<this.cols.length&&this.cols[cc].t==='calc')cc++;
+        if(cc>=this.cols.length)break;
+        const col=this.cols[cc];let val=matrix[i][j].trim();
+        if(col.t==='num'){val=val.replace(/[,$¥%\s]/g,'');let n=parseFloat(val);if(col.k==='vp'||col.k==='mk')n=parseFloat(val)/100;this.rows[r+i][col.k]=isNaN(n)?'':n;}
+        else this.rows[r+i][col.k]=val;
+        cc++;
+      }
+    }
+    recalc();this.renderBody();toast('已粘贴 '+matrix.length+' 行','⌘V');
+  }
+  addRow(){const o={};this.cols.forEach(c=>o[c.k]=c.t==='num'?'':(c.t==='sel'?c.opts[0]:''));this.rows.push(o);}
+}
+
+/* ============ RECALC (cross-grid roll-up) ============ */
+function sumCapital(key){return data[key].reduce((s,r)=>s+(+r.purc||0)+(+r.dd||0)+(+r.rm||0),0);}
+function sumExpense(key){return data[key].reduce((s,r)=>s+(+r.exp||0)+(+r.dd||0),0);}
+function flash(el){el.classList.add('flash');clearTimeout(el._f);el._f=setTimeout(()=>el.classList.remove('flash'),350);}
+function setVal(id,txt){const e=$(id);if(e.textContent!==txt){e.textContent=txt;flash(e);}}
+
+function recalc(){
+  const cur=v=>CUR==='USD'?'$'+fmtNum(v/FX,0):'¥'+fmtNum(v,0);
+  // CAPEX subtotals
+  const mold=sumCapital('MOLD'),die=sumCapital('DIE'),assy=sumCapital('ASSY');
+  const capital=mold+die+assy;
+  const exp=sumExpense('OTHERS');
+  $('tot_MOLD').innerHTML=cur(mold)+' <small>Total</small>';
+  $('tot_DIE').innerHTML=cur(die)+' <small>Total</small>';
+  $('tot_ASSY').innerHTML=cur(assy)+' <small>Total</small>';
+  $('tot_OTHERS').innerHTML=cur(exp)+' <small>Expense</small>';
+  ['MOLD','DIE','ASSY','OTHERS'].forEach(k=>{const e=$('cnt_'+k);if(e)e.textContent=data[k].length+' 行';});
+  // capitalize RM is part of capital already; depreciation pool = capital (customer-owned excluded)
+  const depPool=['MOLD','DIE','ASSY'].reduce((s,k)=>s+data[k].reduce((a,r)=>a+(r.own==='Customer'?0:((+r.purc||0)+(+r.dd||0)+(+r.rm||0))),0),0);
+  setVal('sb_cap',cur(capital));$('sb_cap_usd').textContent=(CUR==='USD'?'¥'+fmtNum(capital,0):'$'+fmtNum(capital/FX,0));
+  setVal('sb_exp',cur(exp));$('sb_exp_usd').textContent=(CUR==='USD'?'¥'+fmtNum(exp,0):'$'+fmtNum(exp/FX,0));
+  setVal('sb_dep',cur(depPool));
+
+  // COST breakdown
+  const matUSD=data.MAT.reduce((s,r)=>s+((+r.qty||0)*(+r.price||0)*(1+(+r.mk||0)))/FX,0);
+  const convUSD=data.CONV.reduce((s,r)=>s+(+r.usd||0),0);
+  const unitCost=matUSD+convUSD;
+  const ASP=3.728;const margin=(ASP-unitCost)/ASP;
+  $('tot_MAT').innerHTML='$'+fmtNum(matUSD,3)+' <small>Material/ea</small>';
+  $('tot_CONV').innerHTML='$'+fmtNum(convUSD,3)+' <small>Conversion/ea</small>';
+  $('cnt_MAT').textContent=data.MAT.length+' 行';$('cnt_CONV').textContent=data.CONV.length+' 行';
+  // rollup panel breakdown bars
+  const items=[['Material 材料',matUSD,'#2563eb']];
+  data.CONV.forEach((r,i)=>{const col=['#0f9d58','#7c3aed','#ff6a00','#d98a00','#94a3b8'][i%5];items.push([r.item||'(项)',+r.usd||0,col]);});
+  const max=Math.max(...items.map(i=>i[1]),0.0001);
+  $('ru_breakdown').innerHTML=items.map(it=>`<div class="ru-row"><div class="l"><span class="swatch" style="background:${it[2]}"></span>${it[0]}</div><div style="display:flex;align-items:center;gap:9px"><div class="bar"><i style="width:${(it[1]/max*100).toFixed(0)}%;background:${it[2]}"></i></div><div class="v">$${fmtNum(it[1],3)}</div></div></div>`).join('');
+  $('ru_mat').textContent='$'+fmtNum(matUSD,3);
+  $('ru_conv').textContent='$'+fmtNum(convUSD,3);
+  setVal('ru_uc','$'+fmtNum(unitCost,3));
+  setVal('sb_uc','$'+fmtNum(unitCost,3));
+  const mp=(margin*100).toFixed(1)+'%';
+  const cls=margin>=0.35?'gr':(margin>=0.25?'am':'');
+  $('ru_margin').innerHTML=`<span class="margin-chip chip ${cls}">${mp}</span>`;
+  setVal('sb_mar',mp);$('sb_mar').style.color=margin>=0.35?'#34d399':(margin>=0.2?'#fbbf24':'#f87171');
+  const depItem=data.CONV.find(r=>/depreciation|折旧/i.test(r.item));
+  $('ru_depalloc').textContent='$'+fmtNum(depItem?+depItem.usd||0:0,3);
+}
+
+/* ============ INIT ============ */
+['MOLD','DIE','ASSY','OTHERS','MAT','CONV'].forEach(k=>grids[k]=new Grid('grid_'+k,k));
+
+// document-level paste
+document.addEventListener('paste',e=>{
+  if(activeGrid&&!activeGrid.editing){const txt=(e.clipboardData||window.clipboardData).getData('text');if(txt){activeGrid.paste(txt);e.preventDefault();}}
+});
+document.addEventListener('copy',e=>{if(activeGrid&&!activeGrid.editing&&activeGrid._clip){/* handled in copy() via async clipboard */}});
+
+// formula bar editing
+$('fxinput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&activeGrid&&!$('fxinput').disabled){
+    const g=activeGrid,col=g.cols[g.sel.c],row=g.rows[g.sel.r];
+    let v=$('fxinput').value.trim();
+    if(col.t==='num'){v=v.replace(/[,$¥%\s]/g,'');let n=v===''?'':parseFloat(v);if(col.k==='vp'||col.k==='mk')n=v===''?'':parseFloat(v)/100;row[col.k]=(v===''||isNaN(n))?'':n;}
+    else row[col.k]=v;
+    recalc();g.renderBody();g.wrap.focus();g.applySel();
+  }
+});
+
+// toolbar buttons
+$('filldown').onclick=()=>{if(activeGrid)activeGrid.fillDown();};
+$('addRowBtn').onclick=()=>{const g=activeGrid||grids.MOLD;g.addRow();recalc();g.renderBody();g.select(g.rows.length-1,0,false);g.wrap.focus();};
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const k=b.dataset.add;grids[k].addRow();recalc();grids[k].renderBody();grids[k].wrap.focus();grids[k].select(grids[k].rows.length-1,0,false);});
+
+// currency toggle
+$('curseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;CUR=b.dataset.cur;$('curseg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));Object.values(grids).forEach(g=>g.renderBody());recalc();});
+
+// sub tabs
+$('subtabs').addEventListener('click',e=>{const t=e.target.closest('.subtab');if(!t)return;
+  document.querySelectorAll('.subtab').forEach(x=>x.classList.toggle('active',x===t));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+t.dataset.pane));
+});
+
+recalc();
+grids.MOLD.wrap.focus();grids.MOLD.select(0,0,false);
+</script>
+</body>
+</html>
