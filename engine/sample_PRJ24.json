@@ -1,0 +1,74 @@
+{
+  "version": {
+    "version_no": "v-G4",
+    "gate": "G4",
+    "fx_usd_to_cny": 7.24218,
+    "reporting_ccy": "USD",
+    "wacc": 0.105,
+    "tax_rate": 0.25,
+    "sga_pct": 0.0227,
+    "outbound_ship_pct": 0.01,
+    "inbound_freight_pct": 0.016,
+    "ar_days": 97,
+    "inv_days": 55,
+    "ap_days": 70
+  },
+  "info": {
+    "life_years": 5,
+    "sop_fiscal_year": 2026,
+    "sop_months_in_p1": 7,
+    "period_months": 12,
+    "total_depreciation_months": 55,
+    "depreciation_life_years": 5
+  },
+  "fg": [
+    { "part_no": "2483376-1", "description": "ACTUATOR, GEN2 ACTUATOR ASSY", "asp": 3.7281592 }
+  ],
+  "sales_proposed": {
+    "2483376-1": [600000, 1000000, 1000000, 1000000, 1000000]
+  },
+  "cost_per_unit_usd": {
+    "material": 1.7653963,
+    "labor": 0.1954435,
+    "overhead": 0.1335494,
+    "sustaining_mfg": 0.0100521,
+    "freight_duty": 0.0422499
+  },
+  "opex_other_per_period": [35407.99, 34828.05, 34828.05, 34828.05, 20316.36],
+  "capex": [
+    { "category": "DIE",  "ownership": "TE_ONETIME", "description": "ACTUATOR, CONTACT SPRING", "purc_build": 120823.87, "design_dev": 0, "capitalize_rm": 0, "expense": 0 },
+    { "category": "DIE",  "ownership": "TE_ONETIME", "description": "ACTUATOR, 130 MOTOR",      "purc_build": 118823.87, "design_dev": 0, "capitalize_rm": 0, "expense": 0 },
+    { "category": "DIE",  "ownership": "TE_ONETIME", "description": "ACTUATOR, MOTOR GEAR",      "purc_build": 38000.00,  "design_dev": 0, "capitalize_rm": 0, "expense": 0 },
+    { "category": "DIE",  "ownership": "TE_ONETIME", "description": "ACTUATOR, GREASE",          "purc_build": 118823.87, "design_dev": 0, "capitalize_rm": 0, "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, GEN2 HSG",        "purc_build": 637260.00, "design_dev": 0, "capitalize_rm": 20000.00, "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, RELEASE LEVER",   "purc_build": 80000.00,  "design_dev": 0, "capitalize_rm": 9050.00,  "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, GEN2 COVER",      "purc_build": 70000.00,  "design_dev": 0, "capitalize_rm": 9000.00,  "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, GEAR STAGE1",     "purc_build": 60000.00,  "design_dev": 0, "capitalize_rm": 9000.00,  "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, GEAR STAGE2",     "purc_build": 60000.00,  "design_dev": 0, "capitalize_rm": 7000.00,  "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, GEAR STAGE3",     "purc_build": 60000.00,  "design_dev": 0, "capitalize_rm": 7000.00,  "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, SEALING UNLOCK",  "purc_build": 100000.00, "design_dev": 0, "capitalize_rm": 10000.00, "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, CLIP",            "purc_build": 35000.00,  "design_dev": 0, "capitalize_rm": 3500.00,  "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "ACTUATOR, RELEASE ADAPTER", "purc_build": 35000.00,  "design_dev": 0, "capitalize_rm": 3500.00,  "expense": 0 },
+    { "category": "MOLD", "ownership": "TE_ONETIME", "description": "PIN SEALING",               "purc_build": 100000.00, "design_dev": 0, "capitalize_rm": 10000.00, "expense": 0 },
+    { "category": "OTHERS", "ownership": "TE_ONETIME", "description": "Engineer Hour", "purc_build": 0, "design_dev": 0, "capitalize_rm": 0, "expense": 20000.00 },
+    { "category": "OTHERS", "ownership": "TE_ONETIME", "description": "Soft Tooling",  "purc_build": 0, "design_dev": 0, "capitalize_rm": 0, "expense": 450000.00 },
+    { "category": "OTHERS", "ownership": "TE_ONETIME", "description": "DV/PV Test",    "purc_build": 0, "design_dev": 0, "capitalize_rm": 0, "expense": 360000.00 }
+  ],
+  "bom": {
+    "2483376-1": [
+      { "desc": "ACTUATOR, GEN2 HSG",        "qty": 1, "unit_price": 3.21, "markup": 0.06 },
+      { "desc": "ACTUATOR, CONTACT SPRING",  "qty": 1, "unit_price": 0.85, "markup": 0.06 },
+      { "desc": "ACTUATOR, RELEASE LEVER",   "qty": 1, "unit_price": 0.70, "markup": 0.06 },
+      { "desc": "ACTUATOR, GEN2 COVER",      "qty": 1, "unit_price": 0.95, "markup": 0.06 },
+      { "desc": "ACTUATOR, GEAR STAGE1",     "qty": 1, "unit_price": 0.55, "markup": 0.06 },
+      { "desc": "ACTUATOR, GEAR STAGE2",     "qty": 1, "unit_price": 0.55, "markup": 0.06 },
+      { "desc": "ACTUATOR, GEAR STAGE3",     "qty": 1, "unit_price": 0.55, "markup": 0.06 },
+      { "desc": "ACTUATOR, 130 MOTOR",       "qty": 1, "unit_price": 2.10, "markup": 0.06 },
+      { "desc": "ACTUATOR, MOTOR GEAR",      "qty": 1, "unit_price": 0.65, "markup": 0.06 },
+      { "desc": "ACTUATOR, SEALING UNLOCK",  "qty": 1, "unit_price": 0.60, "markup": 0.06 },
+      { "desc": "ACTUATOR, CLIP",            "qty": 1, "unit_price": 0.25, "markup": 0.06 },
+      { "desc": "ACTUATOR, RELEASE ADAPTER", "qty": 1, "unit_price": 0.30, "markup": 0.06 },
+      { "desc": "PIN SEALING / GREASE",      "qty": 1, "unit_price": 0.80, "markup": 0.06 }
+    ]
+  }
+}
